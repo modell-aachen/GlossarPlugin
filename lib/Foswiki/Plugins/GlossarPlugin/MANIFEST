@@ -1,0 +1,7 @@
+# Release manifest for GlossarPlugin
+data/System/GlossarPlugin.txt 0644 Documentation
+lib/Foswiki/Plugins/GlossarPlugin.pm 0644 Perl module
+lib/Foswiki/Plugins/GlossarPlugin/Controller.pm 0644 Controller for the JavaScript
+lib/Foswiki/Plugins/GlossarPlugin/Config.spec 0644 Configuration
+pub/System/GlossarPlugin/jquery.thesaurus.js 0644 actual thesaurus script
+pub/System/GlossarPlugin/jquery.thesaurus.zip 0644 Original Thesaurus script
