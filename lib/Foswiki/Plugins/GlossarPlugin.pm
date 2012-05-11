@@ -72,7 +72,7 @@ sub initPlugin {
       my $popindelay = $Foswiki::cfg{Extensions}{GlossarPlugin}{PopInDelay} || 1000;
       my $preload = $Foswiki::cfg{Extensions}{GlossarPlugin}{Preload} || 400;
       my $script = <<SCRIPT;
-<script src="/pub/System/GlossarPlugin/jquery.thesaurus.js" type="text/javascript"></script>
+<script src="%PUBURLPATH%/System/GlossarPlugin/jquery.thesaurus.js" type="text/javascript"></script>
 <script type="text/javascript">
 <!--
 \$.Thesaurus({
