@@ -337,8 +337,7 @@ Thesaurus.prototype = {
             tooltipNode.die('click').live('click', this, function(e) {
                 $.getScript(e.data.options.controller + '?term=' + term + '&onclick=1');
             });
-            this._searchTermsInDOM(tooltipNode);
-            this._innerMarkup(tooltipNode, $(parentTooltipNode).attr('id'));
+            this._thesaurifyRecursive(tooltipNode, $(parentTooltipNode).attr('id'));
             this.bindUI(tooltipNode);
         }
     },
@@ -411,88 +410,48 @@ Thesaurus.prototype = {
         $.getScript(this.options.controller, $.proxy(function(){
             this.terms = this._processResponse($.callbackData);
             $.each(this.options.containers, $.proxy(function(i, node) {
-                this._searchTermsInDOM(node);
-                this._markup(node);
+                this._thesaurifyRecursive(node);
             }, this));
             this.bindUI('body');
         }, this));
     },
     /**
-     * Now parse already marked terms wrapping them with DFN tag
-     * @param HTMLNode node
-     * @see _markTerm
-     */
-    _markup : function(node) {
-        var re = new RegExp(TPL_TAG_OPEN + "(.*?)" + TPL_TAG_OPEN, 'g');
-        $(node).html($(node).html().replace(re, '<dfn class=\"thesaurus\">$1</dfn>'));
-    },
-    /**
-     * Parse especiall for tooltip over tooltip, to point parent tooltip id
-     * @param HTMLNode node
-     * @param string parentId
-     * @see _processOverlayTooltip
-     */
-    _innerMarkup : function(node, parentId) {
-        var re = new RegExp(TPL_TAG_OPEN + "(.*?)" + TPL_TAG_OPEN, 'g');
-        $(node).html($(node).html().replace(re, '<dfn rel=\"' + parentId
-            + '\" class=\"thesaurus\">$1</dfn>'));
-    },
-    /**
-     * Since I can't apply any HTML working with textNodes, just mark them to be able then
-     * parse them in document HTML
-     * @param string term
-     * @param string line
-     * @see _markup
-     */
-    _markTerm : function(term, line) {
-        var modifier = this.options.caseSensitive=="on"?"g":"gi";
-        // Only term in nodeValue
-	if(term == line) {
-            return TPL_TAG_OPEN + line + TPL_TAG_CLOSE;
-        }
-        //term" ....
-	var re = new RegExp("^("+term+")(" + ESCAPERS + ")", modifier);
-	line = line.replace(re, TPL_TAG_OPEN + "$1" + TPL_TAG_CLOSE + "$2");
-        //... "term
-	re = new RegExp("(" + ESCAPERS + ")("+term+")$", modifier);
-	line = line.replace(re, "$1" + TPL_TAG_OPEN + "$2" + TPL_TAG_CLOSE);
-        // .. "term" ..
-	re = new RegExp("(" + ESCAPERS + ")("+term+")(" + ESCAPERS + ")", modifier);
-	line = line.replace(re, "$1" + TPL_TAG_OPEN +"$2" + TPL_TAG_CLOSE + "$3");
-	return line;
-    },
-    /**
      * Check the node value against terms list
      * @param HTMLNode node
      */
-    _checkNodeValue : function(node) {
+    _thesaurifyNode : function(node, relId) {
+        var html = $('<span></span>').append($(node).clone()).html();
+        var modifier = this.options.caseSensitive=="on"?"":"i";
         $.each(this.terms, $.proxy(function(inx, term){
-            if (term.length <= node.nodeValue.length) {
-                if (term != SKIPTERMS) {
-                    node.nodeValue = this._markTerm(term.toString(), node.nodeValue.toString());
-                    //node.nodeValue = this._markTerm(term.toString(), value.toString());
-                }
-            }
+            var re = new RegExp('\\b('+term+')\\b', modifier);
+            if (relId)
+                html = html.replace(re, '<dfn rel="'+ relId +'" class="thesaurus">$1</dfn>');
+            else
+                html = html.replace(re, '<dfn class="thesaurus">$1</dfn>');
         }, this));
+        $(node).replaceWith(html);
     },
     /**
      * Traverses configured nodes for all their children textNodes
      * @param HTMLNode node
      */
-    _searchTermsInDOM : function(node) {
+    _thesaurifyRecursive : function(node, relId) {
+        var nodes = [];
         $.each($(node).get(), $.proxy(function(inx, el){
             $.each(el.childNodes, $.proxy(function(i, child){
                 if (child.childNodes.length && -1 == $.inArray(child.tagName, UNAPPROPRIATE_TAGS)) {
-                    this._searchTermsInDOM(child);
+                    this._thesaurifyRecursive(child, relId);
                 }
                 // Is it a non-empty text node?
                 if (undefined === child.tagName && child.nodeValue.length) {
-                    this._checkNodeValue(child);
+                    nodes.push(child);
                 }
             }, this));
         }, this));
 
-
+        $.each(nodes, $.proxy(function(idx, el) {
+            this._thesaurifyNode(el, relId);
+        }, this));
     }
 };
 
