@@ -29,7 +29,7 @@ use Foswiki::Plugins ();    # For the API version
 
 our $VERSION = '$Rev: 8536 $';
 
-our $RELEASE = '0.1.4';
+our $RELEASE = '0.2.0';
 
 our $SHORTDESCRIPTION = 'Creates a pop-up glossar for your wiki.';
 
@@ -63,6 +63,12 @@ sub initPlugin {
     # only add scripts if "turned on"
     my $status = Foswiki::Func::getPreferencesValue( 'GLOSSAR' );
     if($status && $status eq '1') {
+      my $iTopic = 'GlossarIdentifier';
+      my $glossarWeb = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb};
+      my ($iMeta, $iText) = Foswiki::Func::readTopic($glossarWeb, $iTopic);
+      my $ident = $iMeta->get( 'GLOSSAR' );
+      $ident = $ident->{index} if $ident;
+
       # Add Script to header
       #@TODO %PUBDIR
       my $restPath = Foswiki::Func::getScriptUrl('','','rest');
@@ -80,6 +86,7 @@ sub initPlugin {
     containers: ['$containers'],
     effect: $effect,
     controller: '$restPath/GlossarPlugin/controller',
+    id: $ident,
     popindelay: $popindelay,
     preload: $preload
 });
@@ -110,6 +117,84 @@ sub restController {
    require Foswiki::Plugins::GlossarPlugin::Controller;
    return Foswiki::Plugins::GlossarPlugin::Controller::response( $session, $subject, $verb, $response );
 }   
+
+=begin TML
+
+---++ beforeSaveHandler($text, $topic, $web, $meta )
+   * =$text= - text _with embedded meta-data tags_
+   * =$topic= - the name of the topic in the current CGI query
+   * =$web= - the name of the web in the current CGI query
+   * =$meta= - the metadata of the topic being saved, represented by a Foswiki::Meta object.
+
+This handler is called each time a topic is saved.
+
+*NOTE:* meta-data is embedded in =$text= (using %META: tags). If you modify
+the =$meta= object, then it will override any changes to the meta-data
+embedded in the text. Modify *either* the META in the text *or* the =$meta=
+object, never both. You are recommended to modify the =$meta= object rather
+than the text, as this approach is proof against changes in the embedded
+text format.
+
+*Since:* Foswiki::Plugins::VERSION = 2.0
+
+=cut
+
+sub beforeSaveHandler {
+    my ( $text, $topic, $web ) = @_;
+
+    # You can work on $text in place by using the special perl
+    # variable $_[0]. These allow you to operate on $text
+    # as if it was passed by reference; for example:
+    # $_[0] =~ s/SpecialString/my alternative/ge;
+    if ($web eq $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb}) {
+        #Foswiki::Func::writeWarning("Speichern im GlossarWeb");
+	# doesn't work if (Foswiki::Func::getContext()->{'new_topic'}) {
+        if (not Foswiki::Func::topicExists($web, $topic)) {
+            #Foswiki::Func::writeWarning("Neues Topic im GlossarWeb");
+	    my $newIdentifier = int(rand(1000000));
+	    my $iTopic = 'GlossarIdentifier';
+            return if $iTopic eq $topic;
+
+	    my ($iMeta, $iText) = Foswiki::Func::readTopic($web, $iTopic);
+	    $iMeta->put( 'GLOSSAR', { index => $newIdentifier } );
+	    Foswiki::Func::saveTopic($web, $iTopic, $iMeta, $iText, { ignorepermissions => 1 });
+        }
+    } 
+}
+
+=begin TML
+
+---++ afterSaveHandler($text, $topic, $web, $error, $meta )
+   * =$text= - the text of the topic _excluding meta-data tags_
+     (see beforeSaveHandler)
+   * =$topic= - the name of the topic in the current CGI query
+   * =$web= - the name of the web in the current CGI query
+   * =$error= - any error string returned by the save.
+   * =$meta= - the metadata of the saved topic, represented by a Foswiki::Meta object 
+
+This handler is called each time a topic is saved.
+
+*NOTE:* meta-data is embedded in $text (using %META: tags)
+
+*Since:* Foswiki::Plugins::VERSION 2.0
+
+=cut
+
+#sub afterSaveHandler {
+#    my ( $text, $topic, $web, $error, $meta ) = @_;
+#
+#    if ($web eq $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb}) {
+#	    Foswiki::Func::writeWarning("Speichern im GlossarWeb");
+#	    # XXX doesn't work: if (Foswiki::Func::getContext()->{'new_topic'}) {
+#	    if (not Foswiki::Func::topicExists($web, $topic)) {
+#              Foswiki::Func::writeWarning("Neues Topic im GlossarWeb");
+#            }
+#    } 
+#    # You can work on $text in place by using the special perl
+#    # variable $_[0]. These allow you to operate on $text
+#    # as if it was passed by reference; for example:
+#    # $_[0] =~ s/SpecialString/my alternative/ge;
+#}
 
 1;
 

@@ -97,6 +97,12 @@ sub response {
     payload : $re
 };
 RESP
+
+  $response->header(
+    -'Cache-Control' => 'max-age=36000, public',
+    -'Expires' => '+12h',
+  );
+
    return $resp;
 }
 

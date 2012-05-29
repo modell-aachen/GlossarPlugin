@@ -407,13 +407,25 @@ Thesaurus.prototype = {
      * 4) Binds eventhandlers to them
      */
     bootstrap : function() {
-        $.getScript(this.options.controller, $.proxy(function(){
-            this.terms = this._processResponse($.callbackData);
-            $.each(this.options.containers, $.proxy(function(i, node) {
-                this._thesaurifyRecursive(node);
-            }, this));
-            this.bindUI('body');
-        }, this));
+//        $.getScript(this.options.controller, $.proxy(function(){
+//            this.terms = this._processResponse($.callbackData);
+//            $.each(this.options.containers, $.proxy(function(i, node) {
+//                this._thesaurifyRecursive(node);
+//            }, this));
+//            this.bindUI('body');
+//        }, this));
+        $.ajax({
+		url:this.options.controller+ "?" + this.options.id,
+                dataType: "script",
+                success: $.proxy(function(){
+                  this.terms = this._processResponse($.callbackData);
+                  $.each(this.options.containers, $.proxy(function(i, node) {
+                    this._thesaurifyRecursive(node);
+                  }, this));
+                  this.bindUI('body');
+                }, this),
+		cache: true 
+	});
     },
     /**
      * Check the node value against terms list
@@ -465,7 +477,8 @@ Thesaurus.options = {
     effect: null, // Can be also fade or slide
     controller: 'controller.csv.php', // Path to the controller
     popindelay: 1000,
-    preload: 400
+    preload: 400,
+    id: 0
 };
 // Alternative way to specify nodes you wat analyze for terms occurances
 // <code>
