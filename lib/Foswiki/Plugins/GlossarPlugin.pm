@@ -60,6 +60,10 @@ sub initPlugin {
     # controller to be called from the JavaScript
     Foswiki::Func::registerRESTHandler( 'controller', \&restController );
 
+    # Tag handler for searches
+    Foswiki::Func::registerTagHandler(
+	            'GLOSSARSEARCHOPTS', \&_GLOSSARSEARCHOPTS );
+
     # only add scripts if "turned on"
     my $status = Foswiki::Func::getPreferencesValue( 'GLOSSAR' );
     if($status && $status eq '1') {
@@ -147,13 +151,24 @@ sub beforeSaveHandler {
     # as if it was passed by reference; for example:
     # $_[0] =~ s/SpecialString/my alternative/ge;
     if ($web eq $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb}) {
-        #Foswiki::Func::writeWarning("Speichern im GlossarWeb");
-	# doesn't work if (Foswiki::Func::getContext()->{'new_topic'}) {
+        my $indexChanged = 0;
+        my $iTopic = 'GlossarIdentifier';
+        return if $iTopic eq $topic;
+
+	# Check if topic is new, or keywords have changed
+	# XXX doesn't work if (Foswiki::Func::getContext()->{'new_topic'}) {
         if (not Foswiki::Func::topicExists($web, $topic)) {
-            #Foswiki::Func::writeWarning("Neues Topic im GlossarWeb");
+	    $indexChanged = 1;
+	} else {
+            my ($oldMeta, $oldText) = Foswiki::Func::readTopic($web, $topic);	    
+	    my $oldTags = $oldMeta->get( 'FIELD', 'keywords' );
+	    my $newMeta = new Foswiki::Meta($Foswiki::Plugins::SESSION, $web, $topic, $text);
+	    my $newTags = $newMeta->get( 'FIELD', 'keywords' );
+	    $indexChanged = ((not $oldTags) || (not $newTags) || not ($newTags->{value} eq $oldTags->{value}));
+        }
+
+	if($indexChanged) {
 	    my $newIdentifier = int(rand(1000000));
-	    my $iTopic = 'GlossarIdentifier';
-            return if $iTopic eq $topic;
 
 	    my ($iMeta, $iText) = Foswiki::Func::readTopic($web, $iTopic);
 	    $iMeta->put( 'GLOSSAR', { index => $newIdentifier } );
@@ -162,39 +177,11 @@ sub beforeSaveHandler {
     } 
 }
 
-=begin TML
-
----++ afterSaveHandler($text, $topic, $web, $error, $meta )
-   * =$text= - the text of the topic _excluding meta-data tags_
-     (see beforeSaveHandler)
-   * =$topic= - the name of the topic in the current CGI query
-   * =$web= - the name of the web in the current CGI query
-   * =$error= - any error string returned by the save.
-   * =$meta= - the metadata of the saved topic, represented by a Foswiki::Meta object 
-
-This handler is called each time a topic is saved.
-
-*NOTE:* meta-data is embedded in $text (using %META: tags)
-
-*Since:* Foswiki::Plugins::VERSION 2.0
-
-=cut
-
-#sub afterSaveHandler {
-#    my ( $text, $topic, $web, $error, $meta ) = @_;
-#
-#    if ($web eq $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb}) {
-#	    Foswiki::Func::writeWarning("Speichern im GlossarWeb");
-#	    # XXX doesn't work: if (Foswiki::Func::getContext()->{'new_topic'}) {
-#	    if (not Foswiki::Func::topicExists($web, $topic)) {
-#              Foswiki::Func::writeWarning("Neues Topic im GlossarWeb");
-#            }
-#    } 
-#    # You can work on $text in place by using the special perl
-#    # variable $_[0]. These allow you to operate on $text
-#    # as if it was passed by reference; for example:
-#    # $_[0] =~ s/SpecialString/my alternative/ge;
-#}
+sub _GLOSSARSEARCHOPTS {
+    my $addQuery = $Foswiki::cfg{Extensions}{GlossarPlugin}{AdditionalQuery};
+    $addQuery = " AND $addQuery" if $addQuery;
+    return $addQuery
+}
 
 1;
 

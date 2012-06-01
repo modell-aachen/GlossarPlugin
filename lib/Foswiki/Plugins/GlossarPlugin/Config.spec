@@ -25,3 +25,6 @@ $Foswiki::cfg{Extensions}{GlossarPlugin}{NotFoundMsg} = '';
 # **STRING**
 # Error message if a user does not have the rights to view a specific definition.
 $Foswiki::cfg{Extensions}{GlossarPlugin}{AccessMsg} = '';
+# **STRING**
+# Additional Query you may specify for valid glossar artikles (eg. META:WORKFLOW.name = 'Approved').
+$Foswiki::cfg{Extensions}{GlossarPlugin}{AdditionalQuery} = '';

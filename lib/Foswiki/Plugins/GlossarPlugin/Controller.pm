@@ -30,6 +30,9 @@ sub response {
    my $user = $Foswiki::Plugins::SESSION->{user}; # user for AccessPermission
    $user = Foswiki::Func::getWikiName($user);
    my $glossar = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb} || 'Glossar'; # The web with the definitions
+   my $addQuery = $Foswiki::cfg{Extensions}{GlossarPlugin}{AdditionalQuery}; # Additional Query
+   $addQuery = " AND $addQuery" if $addQuery;
+   my $windowtitle = '';
 
    my @list = Foswiki::Func::getTopicList( $glossar );
    my $re; # contents of response
@@ -42,15 +45,48 @@ sub response {
        $re = '[]';
      } else {
        $re = '[';
-       # deal with first term because there is no leading comma
-       if(scalar @list > 0) {
-         my $s = shift(@list);
-         $re = "$re'$s'";
-       }
-       foreach my $entry (@list) {
-         $re = $re.",'$entry'";
-       }
-       $re = $re."]";
+#       # deal with first term because there is no leading comma
+#       if(scalar @list > 0) {
+#         my $s = shift(@list);
+#         $re = "$re'$s'";
+#       }
+#       foreach my $entry (@list) {
+#         $re = $re.",'$entry'";
+#       }
+#       my $glossarTerms = Foswiki::Func::query( "form.name = 'GlossarForm' AND Enabled = 'Enabled'", undef, { web => 'Glossar' } );
+#       my @enabledTerms = ();
+#       while ($glossarTerms->hasNext) {
+#           my $webtopic = $glossarTerms->next;
+#	   my ($web, $topic) = Foswiki::Func::normalizeWebTopicName('', $webtopic);
+#	   push( @enabledTerms, "'$topic'" );
+#       }
+#       
+#       $re = $re.join(",", @enabledTerms)."]";
+
+        $re = Foswiki::Func::expandCommonVariables(<<SEARCH, 'GlossarIndex', 'Glossar');
+%SEARCH{
+  type="query"
+  "form.name = 'GlossarForm' AND Enabled = 'Enabled'$addQuery"
+  web="Glossar"
+  nonoise="on"
+  format="\$formfield(keywords)"
+  separator=","
+  footer=""
+  header=""
+}%
+SEARCH
+	# XXX Strange newlines and whitespaces
+	$re =~ s#\s*,\s*#','#g;
+	$re =~ s#\s*\n?$##g;
+	$re = "'$re'";
+	# XXX doublicated tags will cause errors in the javascript (beeing marked up twice)
+	my @xxx = split(',',$re);
+        my %xxxh=();
+        @xxxh{@xxx}=1;
+        delete $xxxh{''};
+        $re = join(',', keys %xxxh);
+	
+	$re = "[$re]";
      }
    } else {
      # return definition of term
@@ -58,27 +94,67 @@ sub response {
      # search for term in order to find out capitalization
      # @TODO: CaseSensitive
      my $topic = '';
-     my $lterm = lc($term);
-     foreach my $entry (@list) {
-       if (lc($entry) eq $lterm) {
-         $topic = "$entry";
-         last;
-       }
-     }
-     if(not $topic) {
+#     my $lterm = lc($term);
+#     foreach my $entry (@list) {
+#       if (lc($entry) eq $lterm) {
+#         $topic = "$entry";
+#         last;
+#       }
+#     }
+     $topic = Foswiki::Func::expandCommonVariables(<<SEARCH, 'GlossarIndex', 'Glossar');
+%SEARCH{
+  type="query"
+  "form.name = 'GlossarForm' AND Enabled = 'Enabled' AND keywords =~ '$term'$addQuery"
+  web="Glossar"
+  nonoise="on"
+  format="\$topic"
+  header=""
+  footer=""
+  separator=","
+}%
+SEARCH
+     $topic =~ s#\n##g;
+     
+     # XXX tags occuring multiple times
+     my @topics = split(',', $topic);
+
+     if(not scalar @topics) {
        # no topic found
        # this can happen, if a definition has been removed since page was rendered
-       $re = $Foswiki::cfg{Extensions}{GlossarPlugin}{NotFoundMsg} || 'Definition not found!';
-     } elsif( not Foswiki::Func::checkAccessPermission('VIEW',$user,'',$topic,$glossar,undef) ) {
-       # user may not view definition
-       $re = $Foswiki::cfg{Extensions}{GlossarPlugin}{AccessMsg} || 'Unfortunately you do not have sufficient permissions to view this definition!'; 
+       $re = $Foswiki::cfg{Extensions}{GlossarPlugin}{NotFoundMsg} || 'Eror: Definition not found!';
+       if ($re =~ m/(.*)\s*:\s*(.*)/) {
+         $windowtitle = $1;
+	 $re = $2;
+       }
      } else {
-       # generate text for popup from found topic
-       # I'm not sure wether this is the proper way to do this
-       my ($meta, $text) = Foswiki::Func::readTopic( $glossar, $topic );
-       $re = Foswiki::Func::expandCommonVariables($text, $topic, $glossar, $meta);
-       $re = Foswiki::Func::renderText($re, $glossar);
+       my $topic = shift @topics;
+       if( not Foswiki::Func::checkAccessPermission('VIEW',$user,'',$topic,$glossar,undef) ) {
+         # user may not view definition
+         $re = $Foswiki::cfg{Extensions}{GlossarPlugin}{AccessMsg} || 'Error: Unfortunately you do not have sufficient permissions to view this definition!';
+         if ($re =~ m/(.*)\s*:\s*(.*)/) {
+           $windowtitle = $1;
+           $re = $2;
+         }
+       } else {
+         # generate text for popup from found topic
+         # I'm not sure wether this is the proper way to do this
+         my ($meta, $text) = Foswiki::Func::readTopic( $glossar, $topic );
+         $re = Foswiki::Func::expandCommonVariables($text, $topic, $glossar, $meta);
+         $re = Foswiki::Func::renderText($re, $glossar);
+
+         #XXX topic title
+         $windowtitle = "<a href=\"".Foswiki::Func::getViewUrl($glossar, $topic)."\">$topic</a>";
+         if(scalar @topics) {
+             my $singleTopic = shift @topics;  
+             $windowtitle .= " <em>(<a href=\"".Foswiki::Func::getViewUrl($glossar, $singleTopic)."\">$singleTopic</a>";
+             foreach $singleTopic (@topics) {
+                 $windowtitle .= ", <a href=\"".Foswiki::Func::getViewUrl($glossar, $singleTopic)."\">$singleTopic</a>";
+             }
+  	   $windowtitle .= ")</em>";
+         }
+       }
      }
+
 
      # prepare message to be returned as payload
      # excape some characters so they can be transmitted
@@ -86,7 +162,6 @@ sub response {
      $re =~ s#\"#\\\"#g;
      $re =~ s#\'#\\\'#g;
      $re =~ s#\n#\<br\>#g;
-
      $re = "'$re'";
    }
 
@@ -94,6 +169,7 @@ sub response {
 \$.callbackData = {
     status : 'ok',
     errorMsg : '',
+    title: '$windowtitle',
     payload : $re
 };
 RESP

@@ -25,7 +25,7 @@ var VERSION = "3.0.3",
     TPL_TAG_OPEN = '~~',
     TPL_TAG_CLOSE = '~~',
     ESCAPERS = '[\\s!;,.%\"\'\\(\\)\\{\\}]',
-    UNAPPROPRIATE_TAGS = ['SCRIPT', 'BASE', 'LINK', 'META', 'STYLE', 'TITLE', 'APPLET', 'OBJECT', 'TEXTAREA', 'FORM', 'INPUT'],
+    UNAPPROPRIATE_TAGS = ['SCRIPT', 'BASE', 'LINK', 'META', 'STYLE', 'TITLE', 'APPLET', 'OBJECT', 'TEXTAREA', 'FORM', 'INPUT', 'DFN'],
     DEFAULTCSS_TPL =
         'div.thesaurus { font-size: 12px; font-family: Arial; position: absolute; width: 300px; z-index: auto; -moz-box-shadow: 5px 5px 5px #444; -webkit-box-shadow: 5px 5px 5px #444; }' +
         'div.thesaurus .thesaurus-header { padding: 5px;  background-color: #3C5F87; -moz-border-radius: 5px 5px 0 0; -webkit-border-radius: 5px 5px 0 0; }' +
@@ -103,11 +103,11 @@ Tooltip.normalize = function(node) {
  * @param event e
  * @param string text
  */
-Tooltip.text = function(e, text) {
+Tooltip.text = function(e, text, title) {
     if (undefined !== e.currentTarget.id) {
         var instance = Tooltip.collection.findById(e.currentTarget.id);
         if (null !== instance) {
-            instance.text(text);
+            instance.text(text, title);
         }
     }
 };
@@ -156,6 +156,7 @@ Tooltip.prototype = {
         this.boundingBox.append(TOOLTIP_BODY_TPL);
         this.boundingBox.find('a.term').html($(this.currentTarget).text());
         this.contentBox = this.boundingBox.find('div.thesaurus-body');
+        this.titleBox = this.boundingBox.find('a.term');
         this.contentBox.html(TOOLTIP_LOADING_TPL);
         if ($.fn.bgiframe) {
             this.boundingBox.bgiframe();
@@ -219,9 +220,13 @@ Tooltip.prototype = {
     /**
      * Changes content of tooltip
      * @param string text
+     * @param title text
      */
-    text : function(text) {
+    text : function(text, title) {
         this.contentBox.html(text);
+	if(undefined !== title) {
+            this.titleBox.html(title);
+        }
     },
     /**
      * Cancels request to destory the tooltip
@@ -354,14 +359,16 @@ Thesaurus.prototype = {
         var instance = Tooltip.show(e);
         var term = $(e.currentTarget).text();
         SKIPTERMS = term;
-        if (undefined !== this.cache[term]) {
-            Tooltip.text(e, this.cache[term]);
+	var fromcache = this.cache[term];
+        if (undefined !== fromcache) {
+            Tooltip.text(e, fromcache[0], fromcache[1]);
             this._processOverlayTooltip(instance.contentBox, e.currentTarget);
         } else {
             $.getScript(this.options.controller + "?term=" + term + "&caseSentitive="
                 + (this.options.caseSentitive ? 1 : 0), $.proxy(function(){
-                this.cache[term] = this._processResponse($.callbackData);
-                Tooltip.text(e, this.cache[term]);
+                fromcache = this._processResponse($.callbackData);
+		this.cache[term] = fromcache;
+                Tooltip.text(e, fromcache[0], fromcache[1]);
                 this._processOverlayTooltip(instance.contentBox, e.currentTarget);
             }, this));
         }
@@ -398,7 +405,7 @@ Thesaurus.prototype = {
             alert(errorMsg);
             return null;
         }
-        return data.payload;
+        return [data.payload, data.title];
     },
     /**
      * 1) Loads list of terms from server
@@ -418,7 +425,7 @@ Thesaurus.prototype = {
 		url:this.options.controller+ "?" + this.options.id,
                 dataType: "script",
                 success: $.proxy(function(){
-                  this.terms = this._processResponse($.callbackData);
+                  this.terms = this._processResponse($.callbackData)[0];
                   $.each(this.options.containers, $.proxy(function(i, node) {
                     this._thesaurifyRecursive(node);
                   }, this));
