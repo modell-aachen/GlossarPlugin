@@ -28,3 +28,6 @@ $Foswiki::cfg{Extensions}{GlossarPlugin}{AccessMsg} = '';
 # **STRING**
 # Additional Query you may specify for valid glossar artikles (eg. META:WORKFLOW.name = 'Approved').
 $Foswiki::cfg{Extensions}{GlossarPlugin}{AdditionalQuery} = '';
+# **STRING**
+# Do not activate glossar in topics that match this regex.
+$Foswiki::cfg{Extensions}{GlossarPlugin}{SkipTopic} = '^(WikiGroups|WikiUsers|WebChanges|WebCreateNewTopic|SolrSearch|WebSearch|WebTopicList|WebPreferences|SitePreferences|WebAtom|WebNotify|WebIndex|WebStatistics)$';

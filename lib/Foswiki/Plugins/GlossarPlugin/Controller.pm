@@ -27,6 +27,7 @@ sub response {
    my ( $session, $subject, $verb, $response ) = @_;
    my $query = $session->{request};
    my $term = $query->{param}->{term}[0]; # term user wants the definition of
+   my $list = $query->{param}->{list}; # if user only wants a list of definitions
    my $user = $Foswiki::Plugins::SESSION->{user}; # user for AccessPermission
    $user = Foswiki::Func::getWikiName($user);
    my $glossar = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb} || 'Glossar'; # The web with the definitions
@@ -34,36 +35,14 @@ sub response {
    $addQuery = " AND $addQuery" if $addQuery;
    my $windowtitle = '';
 
-   my @list = Foswiki::Func::getTopicList( $glossar );
    my $re; # contents of response
    # check if term is given, otherwise a list of terms is requested
    if (not defined $term) {
-     # return list of terms $re = ['Dogs', 'Hens', 'Apples', 'Chives']
-
      # return empty list if user has no access to glossar web
      if( not Foswiki::Func::checkAccessPermission('VIEW',$user,'', undef,$glossar,undef) ) {
        $re = '[]';
      } else {
-       $re = '[';
-#       # deal with first term because there is no leading comma
-#       if(scalar @list > 0) {
-#         my $s = shift(@list);
-#         $re = "$re'$s'";
-#       }
-#       foreach my $entry (@list) {
-#         $re = $re.",'$entry'";
-#       }
-#       my $glossarTerms = Foswiki::Func::query( "form.name = 'GlossarForm' AND Enabled = 'Enabled'", undef, { web => 'Glossar' } );
-#       my @enabledTerms = ();
-#       while ($glossarTerms->hasNext) {
-#           my $webtopic = $glossarTerms->next;
-#	   my ($web, $topic) = Foswiki::Func::normalizeWebTopicName('', $webtopic);
-#	   push( @enabledTerms, "'$topic'" );
-#       }
-#       
-#       $re = $re.join(",", @enabledTerms)."]";
-
-        $re = Foswiki::Func::expandCommonVariables(<<SEARCH, 'GlossarIndex', 'Glossar');
+       $re = Foswiki::Func::expandCommonVariables(<<SEARCH, 'GlossarIndex', 'Glossar');
 %SEARCH{
   type="query"
   "form.name = 'GlossarForm' AND Enabled = 'Enabled'$addQuery"
@@ -118,10 +97,14 @@ SEARCH
      # XXX tags occuring multiple times
      my @topics = split(',', $topic);
 
+     if (scalar $list) {
+	 return "\$.callbackData = { web : '$glossar', definitions : ['".join("','", @topics)."'] };";
+     }
+
      if(not scalar @topics) {
        # no topic found
        # this can happen, if a definition has been removed since page was rendered
-       $re = $Foswiki::cfg{Extensions}{GlossarPlugin}{NotFoundMsg} || 'Eror: Definition not found!';
+       $re = $Foswiki::cfg{Extensions}{GlossarPlugin}{NotFoundMsg} || 'Error: Definition not found!';
        if ($re =~ m/(.*)\s*:\s*(.*)/) {
          $windowtitle = $1;
 	 $re = $2;

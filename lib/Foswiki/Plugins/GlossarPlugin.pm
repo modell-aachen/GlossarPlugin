@@ -60,11 +60,15 @@ sub initPlugin {
     # controller to be called from the JavaScript
     Foswiki::Func::registerRESTHandler( 'controller', \&restController );
 
+    Foswiki::Func::registerRESTHandler( 'redirect', \&restRedirect );
+
     # Tag handler for searches
     Foswiki::Func::registerTagHandler(
 	            'GLOSSARSEARCHOPTS', \&_GLOSSARSEARCHOPTS );
 
     # only add scripts if "turned on"
+    my $exceptions = $Foswiki::cfg{Extensions}{GlossarPlugin}{SkipTopic};
+    return 1 if $exceptions && $topic =~ /$exceptions/;
     my $status = Foswiki::Func::getPreferencesValue( 'GLOSSAR' );
     if($status && $status eq '1') {
       my $iTopic = 'GlossarIdentifier';
@@ -122,6 +126,35 @@ sub restController {
    return Foswiki::Plugins::GlossarPlugin::Controller::response( $session, $subject, $verb, $response );
 }   
 
+sub restRedirect {
+   my ( $session, $subject, $verb, $response ) = @_;
+   my $query = $session->{request};   
+   my $term = $query->{param}->{term}[0];
+   my $glossarWeb = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb};
+   return "Kein Term!" unless $term; # XXX
+
+   # XXX copy/paste
+   my $addQuery = $Foswiki::cfg{Extensions}{GlossarPlugin}{AdditionalQuery}; # Additional Query
+   $addQuery = " AND $addQuery" if $addQuery;
+   my $definition = Foswiki::Func::expandCommonVariables(<<SEARCH, 'GlossarIndex', 'Glossar');
+%SEARCH{
+    type="query"
+    "form.name = 'GlossarForm' AND Enabled = 'Enabled' AND keywords =~ '$term'$addQuery"
+    web="Glossar"
+    nonoise="on"
+    format="\$topic"
+    header=""
+    footer=""
+    limit="1"
+}%
+SEARCH
+   return "Keine Definition zu $term gefunden!" unless $definition; # XXX
+   Foswiki::Func::writeWarning("definition: $definition");
+   my $url = Foswiki::Func::getViewUrl($glossarWeb, $definition);
+   Foswiki::Func::redirectCgiQuery( undef, $url );
+   return "Sie werden zum Begriff weiter geleitet..."; # XXX
+}
+
 =begin TML
 
 ---++ beforeSaveHandler($text, $topic, $web, $meta )
@@ -168,13 +201,26 @@ sub beforeSaveHandler {
         }
 
 	if($indexChanged) {
-	    my $newIdentifier = int(rand(1000000));
-
-	    my ($iMeta, $iText) = Foswiki::Func::readTopic($web, $iTopic);
-	    $iMeta->put( 'GLOSSAR', { index => $newIdentifier } );
-	    Foswiki::Func::saveTopic($web, $iTopic, $iMeta, $iText, { ignorepermissions => 1 });
+            _generateNewId();
         }
     } 
+}
+
+sub _generateNewId {
+    my $web = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb};
+    my $iTopic = 'GlossarIdentifier';
+    my $newIdentifier = int(rand(1000000));
+
+    my ($iMeta, $iText) = Foswiki::Func::readTopic($web, $iTopic);
+    $iMeta->put( 'GLOSSAR', { index => $newIdentifier } );
+    Foswiki::Func::saveTopic($web, $iTopic, $iMeta, $iText, { ignorepermissions => 1 });
+}
+
+# XXX KVP state change does not work
+sub afterRenameHandler {
+    # XXX It seems there is no beforeRenameHandler so I see no way to check, if tags have changed.
+    # So I'm going to generate a new ID unconditionally
+    _generateNewId();
 }
 
 sub _GLOSSARSEARCHOPTS {
