@@ -1,0 +1,78 @@
+%META:TOPICINFO{author="BaseUserMapping_333" comment="reprev" date="1339429406" format="1.1" reprev="8" version="8"}%
+%META:TOPICPARENT{name="WebHome"}%
+---++ %MAKETEXT{"Entrys"}%
+<noautolink>
+%MAKEINDEX{
+  "%SEARCH{
+  type="query"
+  "form.name = 'GlossarForm' AND Enabled = 'Enabled'%GLOSSARSEARCHOPTS%"
+  web="Glossar"
+  nonoise="on"
+  format="$topic"
+  separator=","
+  footer=""
+  header=""
+}%"
+  pattern="(.*)"
+  split=","
+  cols="4"
+  header="$anchors"
+  format="[[Glossar.$1][$1]]"
+  sort="nocase"
+  footer="$n$n<span class='foswikiAlert'>$count</span> topics found"
+}%
+</noautolink>
+
+---++ %MAKETEXT{"Keywords"}%
+<noautolink>
+%MAKEINDEX{
+  "%SEARCH{
+  type="query"
+  "form.name = 'GlossarForm' AND Enabled = 'Enabled'%GLOSSARSEARCHOPTS%"
+  web="Glossar"
+  nonoise="on"
+  format="$formfield(keywords)"
+  separator=","
+  footer=""
+  header=""
+}%"
+  pattern="(.*)"
+  unique="on"
+  split=","
+  cols="4"
+  header="$anchors"
+  format="<span class='glossartag'>$1</span>"
+  sort="nocase"
+  footer="$n$n<span class='foswikiAlert'>$count</span> topics found"
+}%
+</noautolink>
+
+---++ %MAKETEXT{"Create new entry"}%
+%JQREQUIRE{"ui::dialog, ui::button"}%
+<a href="#glossardialog" class="jqUIDialogLink">%MAKETEXT{"Create new entry"}%</a>
+%STARTSECTION{"glossardialog"}%
+<div id="glossardialog" title="%MAKETEXT{"Create new entry"}%" class="jqUIDialog {draggable:true, resizable: true, height:400, width:600}">
+  <form action='%SCRIPTURLPATH{"save"}%/%WEB%' method="post" id="createEntryForm">
+    <input type="hidden" name="t" value="%GMTIME{"$epoch"}%" />
+    <input type="hidden" name="redirectto" value="%WEB%/%TOPIC%#" />
+    <input type="hidden" name="onlynewtopic" value="1" />
+    <input type="hidden" name="templatetopic" value="Glossar.GlossarTemplate" />
+    <input type="hidden" name="Enabled" value="Enabled" />
+    <h3 >%MAKETEXT{"Glossar Entry"}% </h3>
+    <table cellpadding="0" cellspacing="0" style="width: 100%">
+      <tr><td>
+        <input class="foswikiInputField" type="text" name="topic" id="topic" style="width: 100%" value="Eintrag" />
+      </td></tr><tr><td>
+        <textarea name="text" style="width: 100%;" rows="9"></textarea>
+      </td></tr><tr><td>
+        %MAKETEXT{"Tags:"}%<input type="text" class="foswikiInputField jqTextboxList" size="10" name="keywords" value="" id="keywords"/><br />
+      </td></tr><tr><td>
+        <span class='foswikiHidden'>%BUTTON{"Submit" type="submit" id="submitButton"}%</span>
+        %BUTTON{"%MAKETEXT{"create new entry"}%" onclick="$(\"#keywords\").trigger(\"AddValue\",document.forms['createEntryForm'].elements['topic'].value);$('#submitButton').click();" type="script"}%
+      </td></tr>
+    </table>
+  </form>
+<!--a class="jqUIDialogButton {icon:'ui-icon-circle-check'}" onclick="$(\"#keywords\").trigger(\"AddValue\",document.forms['createEntryForm'].elements['topic'].value);$('#submitButton').click();">%MAKETEXT{"Create topic"}%</a>
+<a class="jqUIDialogButton jqUIDialogClose {icon:'ui-icon-cancel'}">%MAKETEXT{"Cancel"}%</a-->
+</div>
+%ENDSECTION{"glossardialog"}%

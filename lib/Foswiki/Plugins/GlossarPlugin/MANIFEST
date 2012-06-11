@@ -1,7 +1,7 @@
 # Release manifest for GlossarPlugin
 data/System/GlossarPlugin.txt 0644 Documentation
 data/System/GlossarForm.txt 0644 Form
-data/System/GlossarIndex.txt 0644 Example for index of all terms.
+data/Sandbox/GlossarIndex.txt 0644 Example for index of all terms.
 lib/Foswiki/Plugins/GlossarPlugin.pm 0644 Perl module
 lib/Foswiki/Plugins/GlossarPlugin/Controller.pm 0644 Controller for the JavaScript
 lib/Foswiki/Plugins/GlossarPlugin/Config.spec 0644 Configuration
