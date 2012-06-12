@@ -1,0 +1,47 @@
+# German translations for GlossarPlugin.
+# Copyright (C) 2012
+# This file is distributed under the same license as the GlossarPlugin package.
+# ModellAachen <support@modell-aachen.de>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: GlossarPlugin 2.0\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: data/Sandbox/GlossarIndex.txt:76
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: data/Sandbox/GlossarIndex.txt:50 data/Sandbox/GlossarIndex.txt:52 data/Sandbox/GlossarIndex.txt:54
+msgid "Create new entry"
+msgstr "Neuen Eintrag erstellen"
+
+#: data/Sandbox/GlossarIndex.txt:75
+msgid "Create topic"
+msgstr "Artikel erstellen"
+
+#: data/Sandbox/GlossarIndex.txt:3
+msgid "Entrys"
+msgstr "Einträge"
+
+#: data/Sandbox/GlossarIndex.txt:61
+msgid "Glossar Entry"
+msgstr "Glossareintrag"
+
+#: data/Sandbox/GlossarIndex.txt:26
+msgid "Keywords"
+msgstr "Stichworte"
+
+#: data/Sandbox/GlossarIndex.txt:68
+msgid "Tags:"
+msgstr "Tags:"
+
+#: data/Sandbox/GlossarIndex.txt:71
+msgid "create new entry"
+msgstr "neuen Eintrag erstellen"
