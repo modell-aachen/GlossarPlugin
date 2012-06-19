@@ -48,7 +48,7 @@
 </noautolink>
 
 ---++ %MAKETEXT{"Create new entry"}%
-%JQREQUIRE{"ui::dialog, ui::button"}%
+%JQREQUIRE{"ui::dialog, ui::button, textboxlist"}%
 <a href="#glossardialog" class="jqUIDialogLink">%MAKETEXT{"Create new entry"}%</a>
 %STARTSECTION{"glossardialog"}%
 <div id="glossardialog" title="%MAKETEXT{"Create new entry"}%" class="jqUIDialog {draggable:true, resizable: true, height:400, width:600}">
