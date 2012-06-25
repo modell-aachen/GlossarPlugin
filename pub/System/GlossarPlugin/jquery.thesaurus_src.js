@@ -442,7 +442,7 @@ Thesaurus.prototype = {
         var html = $('<span></span>').append($(node).clone()).html();
         var modifier = this.options.caseSensitive=="on"?"":"i";
         $.each(this.terms, $.proxy(function(inx, term){
-            var re = new RegExp('(^|\\W)('+term+')(\\W|$)', modifier); // XXX \b instead of (?:\W|bla) does not work because of umlauts
+            var re = new RegExp('(^|[^a-zA-ZöäüßÄÖÜ])('+term+')([^a-zA-ZöäüßÄÖÜ]|$)', modifier); // XXX \b instead of (?:\W|bla) does not work because of umlauts
             if (relId)
                 html = html.replace(re, '$1<dfn rel="'+ relId +'" class="thesaurus">$2</dfn>$3');
             else
