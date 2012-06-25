@@ -1,5 +1,41 @@
 %META:TOPICINFO{author="BaseUserMapping_333" comment="reprev" date="1339429406" format="1.1" reprev="8" version="8"}%
 %META:TOPICPARENT{name="WebHome"}%
+<div class="GlossarDisabledEntries">
+%TWISTY{ 
+    id="GlossarDisabledEntries" 
+    firststart="hide" 
+    remember="on" 
+        noscript="show"
+    showlink="%MAKETEXT{"Disabled entries"}%" 
+    hidelink="%MAKETEXT{"Disabled entries"}%" 
+        showimgleft="%ICONURLPATH{arrow-right}%"
+        hideimgleft="%ICONURLPATH{arrow-down}%" 
+        linkclass="patternTwistyButton" 
+}%
+<noautolink>
+%MAKEINDEX{
+  "%SEARCH{
+  type="query"
+  "form.name = 'GlossarForm' AND NOT Enabled = 'Enabled'%GLOSSARSEARCHOPTS%"
+  web="Glossar"
+  nonoise="on"
+  format="$topic"
+  separator=","
+  footer=""
+  header=""
+}%"
+  pattern="(.*)"
+  split=","
+  cols="4"
+  header="$anchors"
+  format="[[Glossar.$1][$1]]"
+  sort="nocase"
+  footer="$n$n<span class='foswikiAlert'>$count</span> topics found"
+}%
+</noautolink>
+%ENDTWISTY%
+</div>
+
 ---++ %MAKETEXT{"Entrys"}%
 <noautolink>
 %MAKEINDEX{
