@@ -30,6 +30,10 @@ msgstr "Artikel erstellen"
 msgid "Entrys"
 msgstr "Einträge"
 
+#: data/Sandbox/GlossarIndex.txt
+msgid "Disabled entries"
+msgstr "Deaktivierte Einträge"
+
 #: data/Sandbox/GlossarIndex.txt:61
 msgid "Glossar Entry"
 msgstr "Glossareintrag"
