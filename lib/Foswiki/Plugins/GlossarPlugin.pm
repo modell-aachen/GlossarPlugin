@@ -33,7 +33,7 @@ our $RELEASE = '0.2.0';
 
 our $SHORTDESCRIPTION = 'Creates a pop-up glossar for your wiki.';
 
-our $NO_PREFS_IN_TOPIC = 0;
+our $NO_PREFS_IN_TOPIC = 1;
 
 =begin TML
 
@@ -189,15 +189,31 @@ sub beforeSaveHandler {
         return if $iTopic eq $topic;
 
 	# Check if topic is new, or keywords have changed
-	# XXX doesn't work if (Foswiki::Func::getContext()->{'new_topic'}) {
+	# XXX doesn't work: if (Foswiki::Func::getContext()->{'new_topic'}) {
         if (not Foswiki::Func::topicExists($web, $topic)) {
 	    $indexChanged = 1;
 	} else {
-            my ($oldMeta, $oldText) = Foswiki::Func::readTopic($web, $topic);	    
+
+		# Find keywords
+#     $topic = Foswiki::Func::expandCommonVariables(<<SEARCH, 'GlossarIndex', 'Glossar');
+#%QUERY{
+#  "form.name = 'GlossarForm' AND Enabled = 'Enabled' AND keywords =~ '$term'$addQuery"
+#  web="Glossar"
+#  nonoise="on"
+#  format="\$topic"
+#  header=""
+#  footer=""
+#  separator=","
+#}%
+#SEARCH
+    
+	    my ($oldMeta, $oldText) = Foswiki::Func::readTopic($web, $topic);	    
 	    my $oldTags = $oldMeta->get( 'FIELD', 'keywords' );
+            my $oldEnabled = $oldMeta->get ( 'FIELD', 'Enabled' );
 	    my $newMeta = new Foswiki::Meta($Foswiki::Plugins::SESSION, $web, $topic, $text);
 	    my $newTags = $newMeta->get( 'FIELD', 'keywords' );
-	    $indexChanged = ((not $oldTags) || (not $newTags) || not ($newTags->{value} eq $oldTags->{value}));
+            my $newEnabled = $newMeta->get ( 'FIELD', 'Enabled' );
+	    $indexChanged = ((not $oldTags) || (not $newTags) || not ($newTags->{value} eq $oldTags->{value})) || ($newEnabled && $oldEnabled && not ($newEnabled->{value} eq $oldEnabled->{value}));
         }
 
 	if($indexChanged) {
