@@ -364,8 +364,8 @@ Thesaurus.prototype = {
             Tooltip.text(e, fromcache[0], fromcache[1]);
             this._processOverlayTooltip(instance.contentBox, e.currentTarget);
         } else {
-            $.getScript(this.options.controller + "?term=" + term + "&caseSentitive="
-                + (this.options.caseSentitive ? 1 : 0), $.proxy(function(){
+            $.getScript(this.options.controller + "?term=" + term,
+                $.proxy(function(){
                 fromcache = this._processResponse($.callbackData);
 		this.cache[term] = fromcache;
                 Tooltip.text(e, fromcache[0], fromcache[1]);
@@ -478,7 +478,7 @@ Thesaurus.prototype = {
  * Default configuration
  */
 Thesaurus.options = {
-    caseSentitive: true, // Used when matching found terms againstloaded ones
+    caseSensitive: 'off', // Used when matching found terms againstloaded ones
     delay: 250, // Delay before tooltip self-destruction
     containers: [], // Put here list of selectors for the DOM element you want to analyze for terms
     effect: null, // Can be also fade or slide

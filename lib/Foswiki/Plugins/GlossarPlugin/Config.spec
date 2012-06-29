@@ -10,9 +10,9 @@ $Foswiki::cfg{Extensions}{GlossarPlugin}{Containers} = 'div.patternContent div.f
 # **SELECT null,'fade','slide'**
 # Popin effect. Select null for none.
 $Foswiki::cfg{Extensions}{GlossarPlugin}{Effect} = 'null';
-# **SELECT true,false**
+# **SELECT on,off**
 # If terms are case-sensitive.
-$Foswiki::cfg{Extensions}{GlossarPlugin}{Case} = 'false'; 
+$Foswiki::cfg{Extensions}{GlossarPlugin}{Case} = 'off'; 
 # **NUMBER**
 # Additional time you have to hover over a word before the popup appears.<p>You will have to hover PopInDelay + Preload ms before the popup appears.</p>
 $Foswiki::cfg{Extensions}{GlossarPlugin}{PopInDelay} = 1000;

@@ -81,7 +81,7 @@ sub initPlugin {
       #@TODO %PUBDIR
       my $restPath = Foswiki::Func::getScriptUrl('','','rest');
       my $containers = $Foswiki::cfg{Extensions}{GlossarPlugin}{Containers} || '';
-      my $caseSensitive = $Foswiki::cfg{Extensions}{GlossarPlugin}{Case} || 'false';
+      my $caseSensitive = $Foswiki::cfg{Extensions}{GlossarPlugin}{Case} || 'off';
       my $effect = $Foswiki::cfg{Extensions}{GlossarPlugin}{Effect} || 'null';
       my $popindelay = $Foswiki::cfg{Extensions}{GlossarPlugin}{PopInDelay} || 1000;
       my $preload = $Foswiki::cfg{Extensions}{GlossarPlugin}{Preload} || 400;
@@ -90,7 +90,7 @@ sub initPlugin {
 <script type="text/javascript">
 <!--
 \$.Thesaurus({
-    caseSentitive: $caseSensitive,
+    caseSensitive: '$caseSensitive',
     containers: ['$containers'],
     effect: $effect,
     controller: '$restPath/GlossarPlugin/controller',

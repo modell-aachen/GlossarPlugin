@@ -83,10 +83,19 @@ SEARCH
 #         last;
 #       }
 #     }
+     my $caseSensitive = $Foswiki::cfg{Extensions}{GlossarPlugin}{Case} || 'off';
+     my $keywords;
+     if($caseSensitive eq 'off') {
+       $term = lc($term);
+       $keywords = 'lc(keywords)'
+     } else {
+       $keywords = 'keywords';
+     }
+     Foswiki::Func::writeWarning("casesensitive=\"$caseSensitive\" term=$term");
      $topic = Foswiki::Func::expandCommonVariables(<<SEARCH, 'GlossarIndex', 'Glossar');
 %SEARCH{
   type="query"
-  "form.name = 'GlossarForm' AND Enabled = 'Enabled' AND keywords =~ '$term'$addQuery"
+  "form.name = 'GlossarForm' AND Enabled = 'Enabled' AND $keywords =~ '$term'$addQuery"
   web="Glossar"
   nonoise="on"
   format="\$topic"
