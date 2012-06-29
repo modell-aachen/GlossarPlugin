@@ -64,7 +64,10 @@ SEARCH
         @xxxh{@xxx}=1;
         delete $xxxh{''};
         $re = join(',', keys %xxxh);
-	
+
+        # escape . so the regex doesn't wildcard
+	$re =~ s#\.#\\\\.#g;
+
 	$re = "[$re]";
      }
    } else {
