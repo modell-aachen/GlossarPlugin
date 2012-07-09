@@ -325,7 +325,7 @@ Thesaurus.prototype = {
      * @param HTMLNode tooltipNode
      * @param HTMLNode parentTooltipNode
      */
-    _processOverlayTooltip : function(tooltipNode, parentTooltipNode) {
+    _processOverlayTooltip : function(tooltipNode, parentTooltipNode, except) {
         var term = $(parentTooltipNode).text();
         if (tooltipNode) {
             // Collect stats when anything is clicked within tooltip
@@ -334,7 +334,9 @@ Thesaurus.prototype = {
             });
 	    if (this.options.pMode == 'on') {
               this._thesaurifyRecursive(tooltipNode, $(parentTooltipNode).attr('id'));
-	    }
+	    } else if (this.options.pMode == 'single') {
+              this._thesaurifyRecursive(tooltipNode, $(parentTooltipNode).attr('id'), except);
+            }
             this.bindUI(tooltipNode);
         }
     },
@@ -354,14 +356,14 @@ Thesaurus.prototype = {
 	var fromcache = this.cache[term];
         if (undefined !== fromcache) {
             Tooltip.text(e, fromcache[0], fromcache[1]);
-            this._processOverlayTooltip(instance.contentBox, e.currentTarget);
+            this._processOverlayTooltip(instance.contentBox, e.currentTarget, fromcache[2]);
         } else {
             $.getScript(this.options.controller + "?term=" + term,
                 $.proxy(function(){
                 fromcache = this._processResponse($.callbackData);
 		this.cache[term] = fromcache;
                 Tooltip.text(e, fromcache[0], fromcache[1]);
-                this._processOverlayTooltip(instance.contentBox, e.currentTarget);
+                this._processOverlayTooltip(instance.contentBox, e.currentTarget, fromcache[2]);
             }, this));
         }
     },
@@ -397,7 +399,7 @@ Thesaurus.prototype = {
             alert(errorMsg);
             return null;
         }
-        return [data.payload, data.title];
+        return [data.payload, data.title, data.except];
     },
     /**
      * 1) Loads list of terms from server
@@ -430,15 +432,18 @@ Thesaurus.prototype = {
      * Check the node value against terms list
      * @param HTMLNode node
      */
-    _thesaurifyNode : function(node, relId) {
+    _thesaurifyNode : function(node, relId, except) {
         var html = $('<span></span>').append($(node).clone()).html();
         var modifier = this.options.caseSensitive=="on"?"":"i";
         $.each(this.terms, $.proxy(function(inx, term){
-            var re = new RegExp('(^|[^a-zA-ZöäüßÄÖÜ])('+term+')([^a-zA-ZöäüßÄÖÜ]|$)', modifier); // XXX \b does not work because of umlauts
-            if (relId)
-                html = html.replace(re, '$1<dfn rel="'+ relId +'" class="thesaurus">$2</dfn>$3');
-            else
-                html = html.replace(re, '$1<dfn class="thesaurus">$2</dfn>$3');
+//		if(except != undefined && $.inArray(term, except) != -1) {alert("inArray " + term + " : " + except);} else if(except != undefined) {alert("("+except+")["+$.inArray(term, except)+"] = " + term);}
+            if (except === undefined || $.inArray(term, except) == -1) {
+              var re = new RegExp('(^|[^a-zA-ZöäüßÄÖÜ])('+term+')([^a-zA-ZöäüßÄÖÜ]|$)', modifier); // XXX \b does not work because of umlauts
+              if (relId)
+                  html = html.replace(re, '$1<dfn rel="'+ relId +'" class="thesaurus">$2</dfn>$3');
+              else
+                  html = html.replace(re, '$1<dfn class="thesaurus">$2</dfn>$3');
+            }
         }, this));
         $(node).replaceWith(html);
     },
@@ -446,12 +451,12 @@ Thesaurus.prototype = {
      * Traverses configured nodes for all their children textNodes
      * @param HTMLNode node
      */
-    _thesaurifyRecursive : function(node, relId) {
+    _thesaurifyRecursive : function(node, relId, except) {
         var nodes = [];
         $.each($(node).get(), $.proxy(function(inx, el){
             $.each(el.childNodes, $.proxy(function(i, child){
                 if (child.childNodes.length && -1 == $.inArray(child.tagName, UNAPPROPRIATE_TAGS)) {
-                    this._thesaurifyRecursive(child, relId);
+                    this._thesaurifyRecursive(child, relId, except);
                 }
                 // Is it a non-empty text node?
                 if (undefined === child.tagName && child.nodeValue.length) {
@@ -461,7 +466,7 @@ Thesaurus.prototype = {
         }, this));
 
         $.each(nodes, $.proxy(function(idx, el) {
-            this._thesaurifyNode(el, relId);
+            this._thesaurifyNode(el, relId, except);
         }, this));
     }
 };

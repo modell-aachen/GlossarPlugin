@@ -34,6 +34,7 @@ sub response {
    my $addQuery = $Foswiki::cfg{Extensions}{GlossarPlugin}{AdditionalQuery}; # Additional Query
    $addQuery = " AND $addQuery" if $addQuery;
    my $windowtitle = '';
+   my $exceptList = '';
 
    my $re; # contents of response
    # check if term is given, otherwise a list of terms is requested
@@ -92,7 +93,7 @@ SEARCH
        $keywords = 'keywords';
      }
      Foswiki::Func::writeWarning("casesensitive=\"$caseSensitive\" term=$term");
-     $topic = Foswiki::Func::expandCommonVariables(<<SEARCH, 'GlossarIndex', 'Glossar');
+     $topic = Foswiki::Func::expandCommonVariables(<<SEARCH, 'GlossarIndex', $glossar);
 %SEARCH{
   type="query"
   "form.name = 'GlossarForm' AND Enabled = 'Enabled' AND $keywords =~ '$term'$addQuery"
@@ -136,6 +137,15 @@ SEARCH
          my ($meta, $text) = Foswiki::Func::readTopic( $glossar, $topic );
          $re = Foswiki::Func::expandCommonVariables($text, $topic, $glossar, $meta);
          $re = Foswiki::Func::renderText($re, $glossar);
+	 # Get List of definitions for this topic
+	 $exceptList = Foswiki::Func::expandCommonVariables(<<QUERY, 'GlossarIndex', $glossar) if ($Foswiki::cfg{Extensions}{GlossarPlugin}{RecursivePopups} eq 'single' );
+%QUERY{
+  "'$glossar.$topic'/keywords"
+}%
+QUERY
+         $exceptList =~ s#\n##g;
+	 $exceptList =~ s#,\s*#','#g;
+	 $exceptList = "'$exceptList'";
 
          #XXX topic title
          $windowtitle = "<a href=\"".Foswiki::Func::getViewUrl($glossar, $topic)."\">$topic</a>";
@@ -165,6 +175,7 @@ SEARCH
     status : 'ok',
     errorMsg : '',
     title: '$windowtitle',
+    except: [$exceptList],
     payload : $re
 };
 RESP

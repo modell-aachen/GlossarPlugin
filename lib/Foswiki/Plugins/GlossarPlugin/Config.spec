@@ -19,9 +19,10 @@ $Foswiki::cfg{Extensions}{GlossarPlugin}{PopInDelay} = 1000;
 # **NUMBER**
 # Plugin will try to load the definition Preload ms before the popup will appear. If you set this too low the user might see a "Loading" message.
 $Foswiki::cfg{Extensions}{GlossarPlugin}{Preload} = 400;
-# **BOOLEAN**
-# Set this option if you want definitions to be marked in popups.
-$Foswiki::cfg{Extensions}{GlossarPlugin}{RecursivePopups} = '0';
+# **SELECT on, off, single**
+# Choose how definitions will be marked in pupup-windows:
+# <ul><li>on: A rose is a rose is a rose... mark all definitions</li><li>off: do not mark any definitions</li><li>single: mark all definitions except those whose definition is shown in the popup</li></ul>
+$Foswiki::cfg{Extensions}{GlossarPlugin}{RecursivePopups} = 'off';
 # **STRING**
 # Error message if a definition has not been found (usually that means a definition has been removed since the page was rendered).
 $Foswiki::cfg{Extensions}{GlossarPlugin}{NotFoundMsg} = '';
