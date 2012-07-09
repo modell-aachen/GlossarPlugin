@@ -8,16 +8,6 @@
 * @copyright (c) Dmitry Sheiko http://www.cmsdevelopment.com
 */
 
-/*
-' Changes to original version:
-* Removed "Thesaurus 3....." from header
-* Prevented a term being marked in its own definition window (SKIPTERMS)
-* Added . to list of ESCAPERS so words at the end of sentences get detected
-* Added 'TEXTAREA' to UNAPPROPRIATE_TAGS because otherwise this will ruin raw-view.
-* Added FORM and INPUT to UNAPPROPRIATE_TAGS or those will not behave as expected
-* Added a delay before popup appears (popindelay, preload)
-*/
-
 (function( $ ) {
 
 var VERSION = "3.0.3",
@@ -442,7 +432,7 @@ Thesaurus.prototype = {
         var html = $('<span></span>').append($(node).clone()).html();
         var modifier = this.options.caseSensitive=="on"?"":"i";
         $.each(this.terms, $.proxy(function(inx, term){
-            var re = new RegExp('(^|[^a-zA-ZöäüßÄÖÜ])('+term+')([^a-zA-ZöäüßÄÖÜ]|$)', modifier); // XXX \b instead of (?:\W|bla) does not work because of umlauts
+            var re = new RegExp('(^|[^a-zA-ZöäüßÄÖÜ])('+term+')([^a-zA-ZöäüßÄÖÜ]|$)', modifier); // XXX \b does not work because of umlauts
             if (relId)
                 html = html.replace(re, '$1<dfn rel="'+ relId +'" class="thesaurus">$2</dfn>$3');
             else
