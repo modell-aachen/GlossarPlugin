@@ -1,8 +1,8 @@
 %META:TOPICINFO{author="BaseUserMapping_333" comment="reprev" date="1339429406" format="1.1" reprev="8" version="8"}%
 %META:TOPICPARENT{name="WebHome"}%
-<div class="GlossarDisabledEntries">
+<div class="GlossaryDisabledEntries">
 %TWISTY{ 
-    id="GlossarDisabledEntries" 
+    id="GlossaryDisabledEntries" 
     firststart="hide" 
     remember="on" 
         noscript="show"

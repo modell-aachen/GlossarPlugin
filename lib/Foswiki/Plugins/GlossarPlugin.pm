@@ -85,6 +85,7 @@ sub initPlugin {
       my $effect = $Foswiki::cfg{Extensions}{GlossarPlugin}{Effect} || 'null';
       my $popindelay = $Foswiki::cfg{Extensions}{GlossarPlugin}{PopInDelay} || 1000;
       my $preload = $Foswiki::cfg{Extensions}{GlossarPlugin}{Preload} || 400;
+      my $pMode = ($Foswiki::cfg{Extensions}{GlossarPlugin}{RecursivePopups})?'on':'off';
       my $script = <<SCRIPT;
 <script src="%PUBURLPATH%/System/GlossarPlugin/jquery.thesaurus.js" type="text/javascript"></script>
 <script type="text/javascript">
@@ -96,7 +97,8 @@ sub initPlugin {
     controller: '$restPath/GlossarPlugin/controller',
     id: $ident,
     popindelay: $popindelay,
-    preload: $preload
+    preload: $preload,
+    pMode: '$pMode'
 });
 // -->
 </script>

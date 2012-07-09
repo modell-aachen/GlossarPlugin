@@ -332,7 +332,9 @@ Thesaurus.prototype = {
             tooltipNode.die('click').live('click', this, function(e) {
                 $.getScript(e.data.options.controller + '?term=' + term + '&onclick=1');
             });
-            this._thesaurifyRecursive(tooltipNode, $(parentTooltipNode).attr('id'));
+	    if (this.options.pMode == 'on') {
+              this._thesaurifyRecursive(tooltipNode, $(parentTooltipNode).attr('id'));
+	    }
             this.bindUI(tooltipNode);
         }
     },
@@ -475,6 +477,7 @@ Thesaurus.options = {
     controller: 'controller.csv.php', // Path to the controller
     popindelay: 1000,
     preload: 400,
+    pMode: 'on',
     id: 0
 };
 // Alternative way to specify nodes you wat analyze for terms occurances
