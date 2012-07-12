@@ -144,6 +144,7 @@ SEARCH
 }%
 QUERY
          $exceptList =~ s#\n##g;
+	 $exceptList =~ s#\.#\\\\.#g;
 	 $exceptList =~ s#,\s*#','#g;
 	 $exceptList = "'$exceptList'";
 
