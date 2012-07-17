@@ -434,9 +434,8 @@ Thesaurus.prototype = {
      */
     _thesaurifyNode : function(node, relId, except) {
         var html = $('<span></span>').append($(node).clone()).html();
-        var modifier = this.options.caseSensitive=="on"?"":"i";
+        var modifier = this.options.caseSensitive=="on"?"g":"gi";
         $.each(this.terms, $.proxy(function(inx, term){
-//		if(except != undefined && $.inArray(term, except) != -1) {alert("inArray " + term + " : " + except);} else if(except != undefined) {alert("("+except+")["+$.inArray(term, except)+"] = " + term);}
             if (except === undefined || $.inArray(term, except) == -1) {
               var re = new RegExp('(^|[^a-zA-ZöäüßÄÖÜ])('+term+')([^a-zA-ZöäüßÄÖÜ]|$)', modifier); // XXX \b does not work because of umlauts
               if (relId)
