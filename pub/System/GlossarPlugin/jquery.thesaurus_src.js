@@ -142,12 +142,12 @@ Tooltip.prototype = {
         $('body').append('<div id="thesaurus-'
             + this.currentTarget.id + '" class="thesaurus hidden"><!-- --></div>');
         this.boundingBox = $('#thesaurus-' + this.currentTarget.id);
-        this.adjust();
         this.boundingBox.append(TOOLTIP_BODY_TPL);
         this.boundingBox.find('a.term').html($(this.currentTarget).text());
         this.contentBox = this.boundingBox.find('div.thesaurus-body');
         this.titleBox = this.boundingBox.find('a.term');
         this.contentBox.html(TOOLTIP_LOADING_TPL);
+        this.adjust();
         if ($.fn.bgiframe) {
             this.boundingBox.bgiframe();
         }
@@ -267,13 +267,13 @@ Tooltip.prototype = {
             scrollLeft = document.body.scrollLeft;
 
 
-	if (rCornerW < this.boundingBox.offsetWidth)
-            left = scrollLeft + e.clientX - this.boundingBox.offsetWidth;
+	if (rCornerW < this.boundingBox.width()) // Original: this.boundingBox.offsetWidth
+            left = scrollLeft + e.clientX - this.boundingBox.width();
 	else
             left = scrollLeft + e.clientX;
 
-	if (bCornerH < this.boundingBox.offsetHeight)
-            top = scrollTop + e.clientY - this.boundingBox.offsetHeight;
+	if (bCornerH < this.boundingBox.height()) // Original: this.boundingBox.offsetHeight
+            top = scrollTop + e.clientY - this.boundingBox.height();
 	else
             top = scrollTop + e.clientY;
 
