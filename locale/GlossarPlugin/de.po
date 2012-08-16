@@ -43,8 +43,8 @@ msgid "Keywords"
 msgstr "Stichworte"
 
 #: data/Sandbox/GlossarIndex.txt:68
-msgid "Tags:"
-msgstr "Tags:"
+msgid "Synonyms:"
+msgstr "Synonyme:"
 
 #: data/Sandbox/GlossarIndex.txt:71
 msgid "create new entry"

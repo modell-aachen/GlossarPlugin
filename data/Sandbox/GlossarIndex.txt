@@ -101,7 +101,7 @@
       </td></tr><tr><td>
         <textarea name="text" style="width: 100%;" rows="9"></textarea>
       </td></tr><tr><td>
-        %MAKETEXT{"Tags:"}%<input type="text" class="foswikiInputField jqTextboxList" size="10" name="keywords" value="" id="keywords"/><br />
+        %MAKETEXT{"Synonyms:"}%<input type="text" class="foswikiInputField jqTextboxList" size="10" name="keywords" value="" id="keywords"/><br />
       </td></tr><tr><td>
         <span class='foswikiHidden'>%BUTTON{"Submit" type="submit" id="submitButton"}%</span>
         %BUTTON{"%MAKETEXT{"create new entry"}%" onclick="$(\"#keywords\").trigger(\"AddValue\",document.forms['createEntryForm'].elements['topic'].value);$('#submitButton').click();" type="script"}%
