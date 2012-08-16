@@ -90,7 +90,7 @@ sub initPlugin {
 <script src="%PUBURLPATH%/System/GlossarPlugin/jquery.thesaurus.js" type="text/javascript"></script>
 <script type="text/javascript">
 <!--
-\$.Thesaurus({
+jQuery.Thesaurus({
     caseSensitive: '$caseSensitive',
     containers: ['$containers'],
     effect: $effect,

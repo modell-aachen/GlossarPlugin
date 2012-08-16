@@ -111,7 +111,7 @@ SEARCH
      my @topics = split(',', $topic);
 
      if (scalar $list) {
-	 return "\$.callbackData = { web : '$glossar', definitions : ['".join("','", @topics)."'] };";
+	 return "jQuery.callbackData = { web : '$glossar', definitions : ['".join("','", @topics)."'] };";
      }
 
      if(not scalar @topics) {
@@ -172,7 +172,7 @@ QUERY
    }
 
    my $resp = <<RESP;
-\$.callbackData = {
+jQuery.callbackData = {
     status : 'ok',
     errorMsg : '',
     title: '$windowtitle',
