@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GlossarPlugin 2.0\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2012-09-14 16:21+0200\n"
+"Last-Translator: Jan Krüger <krueger@modell-aachen.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -19,33 +19,20 @@ msgid "Cancel"
 msgstr "Abbrechen"
 
 #: data/Sandbox/GlossarIndex.txt:50 data/Sandbox/GlossarIndex.txt:52 data/Sandbox/GlossarIndex.txt:54
-msgid "Create new entry"
-msgstr "Neuen Eintrag erstellen"
-
-#: data/Sandbox/GlossarIndex.txt:75
-msgid "Create topic"
-msgstr "Artikel erstellen"
-
-#: data/Sandbox/GlossarIndex.txt:3
-msgid "Entrys"
-msgstr "Einträge"
+msgid "Create new glossary entry"
+msgstr "Neuen Glossareintrag erstellen"
 
 #: data/Sandbox/GlossarIndex.txt
-msgid "Disabled entries"
-msgstr "Deaktivierte Einträge"
-
-#: data/Sandbox/GlossarIndex.txt:61
-msgid "Glossar Entry"
-msgstr "Glossareintrag"
+msgid "Disabled glossary entries"
+msgstr "Deaktivierte Glossareinträge"
 
 #: data/Sandbox/GlossarIndex.txt:26
 msgid "Keywords"
-msgstr "Stichworte"
+msgstr "Schlagworte"
 
 #: data/Sandbox/GlossarIndex.txt:68
-msgid "Synonyms:"
-msgstr "Synonyme:"
+msgid "Keywords:"
+msgstr "Schlagworte:"
 
-#: data/Sandbox/GlossarIndex.txt:71
-msgid "create new entry"
-msgstr "neuen Eintrag erstellen"
+msgid "Description:"
+msgstr "Beschreibung:"

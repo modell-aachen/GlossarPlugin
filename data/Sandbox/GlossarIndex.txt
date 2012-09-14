@@ -6,8 +6,8 @@
     firststart="hide" 
     remember="on" 
         noscript="show"
-    showlink="%MAKETEXT{"Disabled entries"}%" 
-    hidelink="%MAKETEXT{"Disabled entries"}%" 
+    showlink="%MAKETEXT{"Disabled glossary entries"}%" 
+    hidelink="%MAKETEXT{"Disabled glossary entries"}%" 
         showimgleft="%ICONURLPATH{arrow-right}%"
         hideimgleft="%ICONURLPATH{arrow-down}%" 
         linkclass="patternTwistyButton" 
@@ -18,46 +18,25 @@
   type="query"
   "form.name = 'GlossarForm' AND NOT Enabled = 'Enabled'%GLOSSARSEARCHOPTS%"
   web="Glossar"
+  order="formfield(keywords)"
   nonoise="on"
-  format="$topic"
-  separator=","
+  excludetopic="GlossarTemplate"
+  format="$topic $formfield(keywords)"
+  separator=";"
   footer=""
   header=""
 }%"
-  pattern="(.*)"
-  split=","
+  pattern="([^ ]*)(.*)"
+  split=";"
   cols="4"
   header="$anchors"
-  format="[[Glossar.$1][$1]]"
+  format="[[Glossar.$1][$2]]"
   sort="nocase"
   footer="$n$n<span class='foswikiAlert'>$count</span> topics found"
 }%
 </noautolink>
 %ENDTWISTY%
 </div>
-
----++ %MAKETEXT{"Entrys"}%
-<noautolink>
-%MAKEINDEX{
-  "%SEARCH{
-  type="query"
-  "form.name = 'GlossarForm' AND Enabled = 'Enabled'%GLOSSARSEARCHOPTS%"
-  web="Glossar"
-  nonoise="on"
-  format="$topic"
-  separator=","
-  footer=""
-  header=""
-}%"
-  pattern="(.*)"
-  split=","
-  cols="4"
-  header="$anchors"
-  format="[[Glossar.$1][$1]]"
-  sort="nocase"
-  footer="$n$n<span class='foswikiAlert'>$count</span> topics found"
-}%
-</noautolink>
 
 ---++ %MAKETEXT{"Keywords"}%
 <noautolink>
@@ -83,32 +62,28 @@
 }%
 </noautolink>
 
----++ %MAKETEXT{"Create new entry"}%
+---++ %MAKETEXT{"Create new glossary entry"}%
 %JQREQUIRE{"ui::dialog, ui::button, textboxlist"}%
-<a href="#glossardialog" class="jqUIDialogLink">%MAKETEXT{"Create new entry"}%</a>
+<a href="#glossardialog" class="jqUIDialogLink foswikiButton">%MAKETEXT{"Create new glossary entry"}%</a>
 %STARTSECTION{"glossardialog"}%
-<div id="glossardialog" title="%MAKETEXT{"Create new entry"}%" class="jqUIDialog {draggable:true, resizable: true, height:400, width:600}">
+<div id="glossardialog" title="%MAKETEXT{"Create new glossary entry"}%" class="jqUIDialog {draggable:true, resizable: true, height:400, width:600}">
   <form action='%SCRIPTURLPATH{"save"}%/%WEB%' method="post" id="createEntryForm">
     <input type="hidden" name="t" value="%GMTIME{"$epoch"}%" />
     <input type="hidden" name="redirectto" value="%WEB%/%TOPIC%#" />
     <input type="hidden" name="onlynewtopic" value="1" />
-    <input type="hidden" name="templatetopic" value="Glossar.GlossarTemplate" />
+    <input type="hidden" name="templatetopic" value="%WEB%.GlossarTemplate" />
+    <input type="hidden" name="topic" value="%WEB%.GlossarAUTOINC0000" />
     <input type="hidden" name="Enabled" value="Enabled" />
-    <h3 >%MAKETEXT{"Glossar Entry"}% </h3>
     <table cellpadding="0" cellspacing="0" style="width: 100%">
       <tr><td>
-        <input class="foswikiInputField" type="text" name="topic" id="topic" style="width: 100%" value="Eintrag" />
+        %MAKETEXT{"Keywords:"}%<input type="text" class="foswikiInputField jqTextboxList" size="12" name="keywords" value="" id="keywords"/><br />
       </td></tr><tr><td>
-        <textarea name="text" style="width: 100%;" rows="9"></textarea>
-      </td></tr><tr><td>
-        %MAKETEXT{"Synonyms:"}%<input type="text" class="foswikiInputField jqTextboxList" size="10" name="keywords" value="" id="keywords"/><br />
+        %MAKETEXT{"Description:"}%<br /><textarea name="text" style="width: 100%;" rows="9"></textarea>
       </td></tr><tr><td>
         <span class='foswikiHidden'>%BUTTON{"Submit" type="submit" id="submitButton"}%</span>
-        %BUTTON{"%MAKETEXT{"create new entry"}%" onclick="$(\"#keywords\").trigger(\"AddValue\",document.forms['createEntryForm'].elements['topic'].value);$('#submitButton').click();" type="script"}%
+        %BUTTON{"%MAKETEXT{"Create new entry"}%" onclick="$('#submitButton').click();" type="script"}%
       </td></tr>
     </table>
   </form>
-<!--a class="jqUIDialogButton {icon:'ui-icon-circle-check'}" onclick="$(\"#keywords\").trigger(\"AddValue\",document.forms['createEntryForm'].elements['topic'].value);$('#submitButton').click();">%MAKETEXT{"Create topic"}%</a>
-<a class="jqUIDialogButton jqUIDialogClose {icon:'ui-icon-cancel'}">%MAKETEXT{"Cancel"}%</a-->
 </div>
 %ENDSECTION{"glossardialog"}%

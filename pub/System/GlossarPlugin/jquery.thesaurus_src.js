@@ -6,28 +6,33 @@
 * @version $Id: jquery.thesaurus.js, v 3.0 $
 * @license GNU
 * @copyright (c) Dmitry Sheiko http://www.cmsdevelopment.com
+*
+* Adapted and customised by
+* Modell Aachen GmbH http://modell-aachen.de/
 */
 
 (function( $ ) {
 
-var VERSION = "3.0.3",
-    SKIPTERMS = '',
+var lang = GlossarLang,
     TPL_TAG_OPEN = '~~',
     TPL_TAG_CLOSE = '~~',
-    ESCAPERS = '[\\s!;,.%\"\'\\(\\)\\{\\}]',
-    UNAPPROPRIATE_TAGS = ['SCRIPT', 'BASE', 'LINK', 'META', 'STYLE', 'TITLE', 'APPLET', 'OBJECT', 'TEXTAREA', 'FORM', 'INPUT', 'DFN'],
+    UNAPPROPRIATE_TAGS = {'SCRIPT':1, 'BASE':1, 'LINK':1, 'META':1, 'STYLE':1, 'TITLE':1, 'APPLET':1, 'OBJECT':1, 'TEXTAREA':1, 'FORM':1, 'INPUT':1, 'DFN':1},
     DEFAULTCSS_TPL =
         'div.thesaurus { font-size: 12px; font-family: Arial; position: absolute; width: 300px; z-index: auto; -moz-box-shadow: 5px 5px 5px #444; -webkit-box-shadow: 5px 5px 5px #444; }' +
         'div.thesaurus .thesaurus-header { padding: 5px;  background-color: #3C5F87; -moz-border-radius: 5px 5px 0 0; -webkit-border-radius: 5px 5px 0 0; }' +
-        'div.thesaurus .thesaurus-header a { color: white; font-weight: bold; }' +
-        'div.thesaurus .thesaurus-header a.reference { position: absolute; right: 5px; z-index: auto; display: block; }' +
+        'div.thesaurus .thesaurus-header a.term { color: white; font-weight: bold; }' +
+        'div.thesaurus .thesaurus-header .term_editbtn { float: right; }' +
         'div.thesaurus .thesaurus-body { padding: 5px;  border: 1px solid #3C5F87; background-color: #fff; -moz-border-radius: 0 0 0 5px; -webkit-border-radius: 0 0 0 5px; }' +
+        'div.thesaurus .thesaurus-addendum { background-color: #ddd; margin-top: 1em; }' +
+        'div.thesaurus .thesaurus-box-title { font-weight: bold; }' +
+        'div.thesaurus .thesaurus-alts { margin-top: 0.5em; }' +
+        'div.thesaurus .thesaurus-alts ul { margin: 0; }' +
         'dfn.thesaurus { text-decoration: none; font-style: inherit; border-bottom: 1px dashed black; cursor: pointer; }' +
         '.hidden {display: none}',
-    TOOLTIP_LOADING_TPL = 'Loading...',
-    TOOLTIP_BODY_TPL = '<div class="thesaurus-header"><a class="term"></a></div><div class="thesaurus-body"></div>';
+    TOOLTIP_LOADING_TPL = '<img src="'+foswiki.getPreference('PUBURLPATH')+'/System/JQueryPlugin/images/spinner.gif">',
+    TOOLTIP_BODY_TPL = '<div class="thesaurus-header"><a class="term_editbtn foswikiButton">'+lang.btn_edit_label+'</a><a class="term"></a></div><div class="thesaurus-body"><div class="thesaurus-text"></div><div class="thesaurus-addendum"><div class="thesaurus-syns"><span class="thesaurus-box-title">'+lang.synonyms+': </span><div class="thesaurus-box-content"></div></div><div class="thesaurus-alts"><span class="thesaurus-box-title">'+lang.alt_meanings+':</span><div class="thesaurus-box-content"></div></div></div>';
 
-var Collection = function() { }
+var Collection = function() { };
 /**
  * Collection of tooltip widgets
  */
@@ -93,12 +98,12 @@ Tooltip.normalize = function(node) {
  * @param event e
  * @param string text
  */
-Tooltip.text = function(e, text, title) {
+Tooltip.setContent = function(e, data) {
     if (undefined !== e.currentTarget.id) {
         var instance = Tooltip.collection.findById(e.currentTarget.id);
-        if (null !== instance) {
-            instance.text(text, title);
-        }
+        if (null !== instance) $.each(data, function(idx, text) {
+            instance.setElementText(idx, text);
+        });
     }
 };
 /**
@@ -128,7 +133,6 @@ Tooltip.show = function(e) {
 Tooltip.prototype = {
     options: {},
     boundingBox: null,
-    contentBox: null,
     currentTarget: null,
     parentDelayed : false,
     timer : null,
@@ -143,10 +147,15 @@ Tooltip.prototype = {
             + this.currentTarget.id + '" class="thesaurus hidden"><!-- --></div>');
         this.boundingBox = $('#thesaurus-' + this.currentTarget.id);
         this.boundingBox.append(TOOLTIP_BODY_TPL);
-        this.boundingBox.find('a.term').html($(this.currentTarget).text());
-        this.contentBox = this.boundingBox.find('div.thesaurus-body');
-        this.titleBox = this.boundingBox.find('a.term');
-        this.contentBox.html(TOOLTIP_LOADING_TPL);
+        this.boxes = {};
+        this.boxes.title = this.boundingBox.find('a.term');
+        this.boxes.body = this.boundingBox.find('div.thesaurus-body');
+        this.boxes.text = this.boundingBox.find('div.thesaurus-text');
+        this.boxes.syns = this.boundingBox.find('div.thesaurus-syns .thesaurus-box-content');
+        this.boxes.alts = this.boundingBox.find('div.thesaurus-alts .thesaurus-box-content');
+        this.boxes.edit = this.boundingBox.find('a.term_editbtn').hide();
+        this.boxes.title.html($(this.currentTarget).text());
+        this.boxes.text.html(TOOLTIP_LOADING_TPL);
         this.adjust();
         if ($.fn.bgiframe) {
             this.boundingBox.bgiframe();
@@ -212,11 +221,30 @@ Tooltip.prototype = {
      * @param string text
      * @param title text
      */
-    text : function(text, title) {
-        this.contentBox.html(text);
-	if(undefined !== title) {
-            this.titleBox.html(title);
+    setElementText : function(box, text) {
+        if (box == 'titlehint') {
+            this.boxes.title.attr('title', text);
+            return;
         }
+        if (text === null) {
+            this.boxes[box].empty().parent().hide();
+        } else {
+            this.boxes[box].parent().show();
+        }
+        if (typeof text == 'String') {
+            this.boxes[box].html(text);
+        } else {
+            this.boxes[box].empty().append(text);
+        }
+    },
+    setLink : function(href) {
+        this.boxes.title.attr('href', href);
+    },
+    setEditLink : function(href) {
+        if (href === null)
+            return this.boxes.edit.hide();
+
+        this.boxes.edit.attr('href', href).show();
     },
     /**
      * Cancels request to destory the tooltip
@@ -299,7 +327,9 @@ var Thesaurus = function(options){
 Thesaurus.instance = null;
 
 Thesaurus.prototype = {
-    terms : [],
+    canonicalTerms : {},
+    terms : {},
+    topics : {},
     options : {}, // Configuration
     cache: {}, // Caches requestd term definitions
     timer : null, // Timer for popup delay
@@ -325,47 +355,110 @@ Thesaurus.prototype = {
      * @param HTMLNode tooltipNode
      * @param HTMLNode parentTooltipNode
      */
-    _processOverlayTooltip : function(tooltipNode, parentTooltipNode, except) {
+    _processOverlayTooltip : function(tooltipNode, parentTooltipNode, terms) {
         var term = $(parentTooltipNode).text();
         if (tooltipNode) {
-            // Collect stats when anything is clicked within tooltip
-            tooltipNode.die('click').live('click', this, function(e) {
-                $.getScript(e.data.options.controller + '?term=' + term + '&onclick=1');
-            });
-	    if (this.options.pMode == 'on') {
-              this._thesaurifyRecursive(tooltipNode, $(parentTooltipNode).attr('id'));
-	    } else if (this.options.pMode == 'single') {
-              this._thesaurifyRecursive(tooltipNode, $(parentTooltipNode).attr('id'), except);
-            }
+            this._thesaurifyRecursive($(tooltipNode).find('.thesaurus-text')[0], $(parentTooltipNode).attr('id'), terms);
             this.bindUI(tooltipNode);
         }
+    },
+    /**
+     * Set up tooltip contents once all data is loaded
+     */
+    _populateTooltip : function(e, instance, data, term) {
+        var topics = $.extend({}, this.topics);
+        if (this.options.pMode == 'on')
+            ; // do nothing
+        else if (this.options.pMode == 'single')
+            delete topics[data.topic];
+        else
+            topics = {};
+
+        var o = this;
+        // Click handler for synset links generated in bottom section
+        var synsetClick = function(ev) {
+            // Fetching another definition for the same node, so get rid of cache
+            delete o.cache[term];
+            // Make sure the pointer doesn't suddenly jump outside the tooltip
+            var box = $(instance.boxes.body);
+            box.css('min-height', box.height()+'px');
+            o._fetchTooltip(e, instance, term, ev.data.topic);
+            ev.preventDefault();
+            return false;
+        };
+
+        // Work horse: cobble together all the things to fill into the tooltip
+        var syns = $('<ul></ul>');
+        var alts = syns.clone();
+        var linkbase = foswiki.getPreference('SCRIPTURLPATH')+'/view'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+this.options.web;
+        // Alternative entries
+        if (this.terms[term].length > 1) {
+            $.each(this.terms[term], function(_idx, topic) {
+                if (topic == data.topic) return;
+                // Generate synset
+                var link = $('<a href="#"></a>');
+                link.text(o.topics[topic].join(', '));
+                link.attr('title', topic);
+                link.on('click', {topic: topic}, synsetClick);
+                var li = $('<li></li>');
+                li.append(link);
+                alts.append(li);
+            });
+        } else {
+            alts = null;
+        }
+        if (this.topics[data.topic].length > 1) {
+            var showterms = [];
+            $.each(this.topics[data.topic], function(_idx, aTerm) {
+                if (aTerm == term) return;
+                showterms.push(aTerm);
+            });
+            syns = showterms.join(', ');
+        } else {
+            syns = null;
+        }
+        var content = {
+            title: this._displayTerm(term),
+            titlehint: data.topic,
+            text: data.text,
+            alts: alts,
+            syns: syns
+        };
+        Tooltip.setContent(e, content);
+        instance.setLink(linkbase +'/'+ data.topic);
+        if (data.edit) {
+            instance.setEditLink(foswiki.getPreference('SCRIPTURLPATH')+'/edit'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+this.options.web+'/'+data.topic);
+        } else {
+            instance.setEditLink(null);
+        }
+        this._processOverlayTooltip(instance.boxes.text, e.currentTarget, this._generateTermsIdx(topics));
+    },
+    _fetchTooltip : function(e, instance, term, topic) {
+        Tooltip.setContent(e, {title: this._displayTerm(term), text: TOOLTIP_LOADING_TPL, syns: null, alts: null});
+        instance.setEditLink(null);
+        var fromcache = this.cache[term];
+        if (undefined !== fromcache)
+            return this._populateTooltip(e, instance, fromcache, term);
+
+        if (undefined === topic) topic = this.terms[term][0];
+        var o = this;
+        $.getScript(this.options.controller + "?thetopic="+ topic, function() {
+                fromcache = o._processResponse($.callbackData);
+                o.cache[term] = fromcache;
+                o._populateTooltip(e, instance, fromcache, term);
+        });
     },
     /**
      * on MouseOver event handler
      * @param event e
      */
     _onMouseOver : function(e) {
-        this.e = e; // Nasty, but I don't really know how to handle proxy...
-        this.timer = window.setTimeout($.proxy(this._onMouseOverDelayed, this), this.options.popindelay);
-    },
-    _onMouseOverDelayed : function() {
-        e = this.e;
-        var instance = Tooltip.show(e);
-        var term = $(e.currentTarget).text();
-        SKIPTERMS = term;
-	var fromcache = this.cache[term];
-        if (undefined !== fromcache) {
-            Tooltip.text(e, fromcache[0], fromcache[1]);
-            this._processOverlayTooltip(instance.contentBox, e.currentTarget, fromcache[2]);
-        } else {
-            $.getScript(this.options.controller + "?term=" + term,
-                $.proxy(function(){
-                fromcache = this._processResponse($.callbackData);
-		this.cache[term] = fromcache;
-                Tooltip.text(e, fromcache[0], fromcache[1]);
-                this._processOverlayTooltip(instance.contentBox, e.currentTarget, fromcache[2]);
-            }, this));
+        var _onMouseOverDelayed = function() {
+            var instance = Tooltip.show(e);
+            var term = this._internalTerm($(e.currentTarget).text());
+            this._fetchTooltip(e, instance, term);
         }
+        this.timer = window.setTimeout($.proxy(_onMouseOverDelayed, this), this.options.popindelay);
     },
     /**
      * on MouseOut event handler
@@ -399,7 +492,24 @@ Thesaurus.prototype = {
             alert(errorMsg);
             return null;
         }
-        return [data.payload, data.title, data.except];
+        return data.payload;
+    },
+    _displayTerm : function(term) {
+        return this.options.caseSensitive != 'off' ? term : this.canonicalTerms[term.toLowerCase()];
+    },
+    _internalTerm : function(term) {
+        return this.options.caseSensitive != 'off' ? term : term.toLowerCase();
+    },
+    _generateTermsIdx : function(topics) {
+        var term2topics = {};
+        $.each(topics, function(topic, terms) {
+            $.each(terms, function(id2, term) {
+                if (term2topics[term] === undefined)
+                    term2topics[term] = [];
+                term2topics[term].push(topic);
+            });
+        });
+        return term2topics;
     },
     /**
      * 1) Loads list of terms from server
@@ -408,54 +518,57 @@ Thesaurus.prototype = {
      * 4) Binds eventhandlers to them
      */
     bootstrap : function() {
-//        $.getScript(this.options.controller, $.proxy(function(){
-//            this.terms = this._processResponse($.callbackData);
-//            $.each(this.options.containers, $.proxy(function(i, node) {
-//                this._thesaurifyRecursive(node);
-//            }, this));
-//            this.bindUI('body');
-//        }, this));
+        var o = this;
         $.ajax({
-		url:this.options.controller+ "?" + this.options.id,
+                url:this.options.controller+ "?" + this.options.id,
                 dataType: "script",
                 success: $.proxy(function(){
-                  this.terms = this._processResponse($.callbackData)[0];
-                  $.each(this.options.containers, $.proxy(function(i, node) {
-                    this._thesaurifyRecursive(node);
-                  }, this));
+                  this.topics = this._processResponse($.callbackData);
+                  // Downcase the terms for case-insensitive lookups
+                  if (this.options.caseSensitive == 'off') $.each(this.topics, function(idx, termset) {
+                      o.topics[idx] = $.map(termset, function(val) {
+                          var lcval = val.toLowerCase();
+                          o.canonicalTerms[lcval] = val;
+                          return lcval;
+                      });
+                  });
+                  this.terms = this._generateTermsIdx(this.topics);
+                  $.each(this.options.containers, function(i, node) {
+                    o._thesaurifyRecursive(node, undefined, o.terms);
+                  });
                   this.bindUI('body');
                 }, this),
-		cache: true 
-	});
+                cache: true
+        });
     },
     /**
      * Check the node value against terms list
      * @param HTMLNode node
      */
-    _thesaurifyNode : function(node, relId, except) {
+    _thesaurifyNode : function(node, relId, terms) {
         var html = $('<span></span>').append($(node).clone()).html();
-        var modifier = this.options.caseSensitive=="on"?"g":"gi";
-        $.each(this.terms, $.proxy(function(inx, term){
-            if (except === undefined || $.inArray(term, except) == -1) {
-              var re = new RegExp('(^|[^a-zA-ZöäüßÄÖÜ])('+term+')([^a-zA-ZöäüßÄÖÜ]|$)', modifier); // XXX \b does not work because of umlauts
-              if (relId)
-                  html = html.replace(re, '$1<dfn rel="'+ relId +'" class="thesaurus">$2</dfn>$3');
-              else
-                  html = html.replace(re, '$1<dfn class="thesaurus">$2</dfn>$3');
-            }
-        }, this));
+        var modifier = this.options.caseSensitive!="off"?"g":"gi";
+        $.each(terms, function(inx, term) {
+            // \b does not work with non-ASCII letters, so use XRegExp lib w/ Unicode addon
+            // \P{L} = extension to match everything except Unicode letters
+            var re = XRegExp('(^|\\P{L})('+XRegExp.escape(inx)+')(\\P{L}|$)', modifier);
+            if (relId)
+                html = html.replace(re, '$1<dfn rel="'+ relId +'" class="thesaurus">$2</dfn>$3');
+            else
+                html = html.replace(re, '$1<dfn class="thesaurus">$2</dfn>$3');
+        });
         $(node).replaceWith(html);
     },
     /**
      * Traverses configured nodes for all their children textNodes
      * @param HTMLNode node
      */
-    _thesaurifyRecursive : function(node, relId, except) {
+    _thesaurifyRecursive : function(node, relId, terms) {
         var nodes = [];
         $.each($(node).get(), $.proxy(function(inx, el){
             $.each(el.childNodes, $.proxy(function(i, child){
-                if (child.childNodes.length && -1 == $.inArray(child.tagName, UNAPPROPRIATE_TAGS)) {
-                    this._thesaurifyRecursive(child, relId, except);
+                if (child.childNodes.length && undefined === UNAPPROPRIATE_TAGS[child.tagName]) {
+                    this._thesaurifyRecursive(child, relId, terms);
                 }
                 // Is it a non-empty text node?
                 if (undefined === child.tagName && child.nodeValue.length) {
@@ -465,7 +578,7 @@ Thesaurus.prototype = {
         }, this));
 
         $.each(nodes, $.proxy(function(idx, el) {
-            this._thesaurifyNode(el, relId, except);
+            this._thesaurifyNode(el, relId, terms);
         }, this));
     }
 };
@@ -479,6 +592,7 @@ Thesaurus.options = {
     containers: [], // Put here list of selectors for the DOM element you want to analyze for terms
     effect: null, // Can be also fade or slide
     controller: 'controller.csv.php', // Path to the controller
+    web: 'Glossar', // Web we're playing in
     popindelay: 1000,
     preload: 400,
     pMode: 'on',
