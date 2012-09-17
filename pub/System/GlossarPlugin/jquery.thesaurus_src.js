@@ -356,9 +356,8 @@ Thesaurus.prototype = {
      * @param HTMLNode parentTooltipNode
      */
     _processOverlayTooltip : function(tooltipNode, parentTooltipNode, terms) {
-        var term = $(parentTooltipNode).text();
         if (tooltipNode) {
-            this._thesaurifyRecursive($(tooltipNode).find('.thesaurus-text')[0], $(parentTooltipNode).attr('id'), terms);
+            this._thesaurifyRecursive($(tooltipNode)[0], $(parentTooltipNode).attr('id'), terms);
             this.bindUI(tooltipNode);
         }
     },
