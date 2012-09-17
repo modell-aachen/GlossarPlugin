@@ -81,7 +81,7 @@
         %MAKETEXT{"Description:"}%<br /><textarea name="text" style="width: 100%;" rows="9"></textarea>
       </td></tr><tr><td>
         <span class='foswikiHidden'>%BUTTON{"Submit" type="submit" id="submitButton"}%</span>
-        %BUTTON{"%MAKETEXT{"Create new entry"}%" onclick="$('#submitButton').click();" type="script"}%
+        %BUTTON{"%MAKETEXT{"Create new glossary entry"}%" onclick="$('#submitButton').click();" type="script"}%
       </td></tr>
     </table>
   </form>
