@@ -397,7 +397,9 @@ Thesaurus.prototype = {
                 if (topic == data.topic) return;
                 // Generate synset
                 var link = $('<a href="#"></a>');
-                link.text(o.topics[topic].join(', '));
+                var terms = o.topics[topic];
+                if (o.options.caseSensitive == 'off') terms = $.map(terms, function(v) { return o._displayTerm(v); });
+                link.text(terms.join(', '));
                 link.attr('title', topic);
                 link.on('click', {topic: topic}, synsetClick);
                 var li = $('<li></li>');
@@ -411,6 +413,7 @@ Thesaurus.prototype = {
             var showterms = [];
             $.each(this.topics[data.topic], function(_idx, aTerm) {
                 if (aTerm == term) return;
+                if (o.options.caseSensitive == 'off') aTerm = o._displayTerm(aTerm);
                 showterms.push(aTerm);
             });
             syns = showterms.join(', ');
