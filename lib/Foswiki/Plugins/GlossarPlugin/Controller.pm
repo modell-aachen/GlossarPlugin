@@ -120,7 +120,7 @@ sub response {
     my $errmsg = defined($re[0]) ? '' : $re[2];
 
     my $resp = "jQuery.callbackData="
-      . encode_json({
+      . JSON->new->encode({
             status   => $status,
             errorMsg => $errmsg,
             payload  => $payload,
