@@ -345,7 +345,7 @@ Thesaurus.prototype = {
      */
     _processOverlayTooltip : function(tooltipNode, parentTooltipNode, terms) {
         if (tooltipNode) {
-            this._thesaurifyRecursive($(tooltipNode)[0], $(parentTooltipNode).attr('id'), terms);
+            this._thesaurify($(tooltipNode).find('.thesaurus-text')[0], $(parentTooltipNode).attr('id'), terms);
             this.bindUI(tooltipNode);
         }
     },
@@ -510,7 +510,7 @@ Thesaurus.prototype = {
                   });
                   this.terms = this._generateTermsIdx(this.topics);
                   $.each(this.options.containers, function(i, node) {
-                    o._thesaurifyRecursive(node, undefined, o.terms);
+                    o._thesaurify(node, undefined, o.terms);
                   });
                   this.bindUI('body');
                 }, this),
@@ -521,13 +521,9 @@ Thesaurus.prototype = {
      * Check the node value against terms list
      * @param HTMLNode node
      */
-    _thesaurifyNode : function(node, relId, terms) {
+    _thesaurifyNode : function(node, relId, regs) {
         var html = $('<span></span>').append($(node).clone()).html();
-        var modifier = this.options.caseSensitive!="off"?"g":"gi";
-        $.each(terms, function(inx, term) {
-            // \b does not work with non-ASCII letters, so use XRegExp lib w/ Unicode addon
-            // \P{L} = extension to match everything except Unicode letters
-            var re = XRegExp('(^|\\P{L})('+XRegExp.escape(inx)+')(\\P{L}|$)', modifier);
+        $.each(regs, function(inx, re) {
             if (relId)
                 html = html.replace(re, '$1<dfn rel="'+ relId +'" class="thesaurus">$2</dfn>$3');
             else
@@ -539,12 +535,23 @@ Thesaurus.prototype = {
      * Traverses configured nodes for all their children textNodes
      * @param HTMLNode node
      */
-    _thesaurifyRecursive : function(node, relId, terms) {
+    _thesaurify : function(node, relId, terms) {
+        var regs = [];
+        var modifier = this.options.caseSensitive!="off"?"g":"gi";
+        $.each(terms, function(term, syno) {
+            // \b does not work with non-ASCII letters, so use XRegExp lib w/ Unicode addon
+            // \P{L} = extension to match everything except Unicode letters
+            var re = XRegExp('(^|\\P{L})('+XRegExp.escape(term)+')(\\P{L}|$)', modifier);
+            regs.push(re);
+        });
+        this._thesaurifyRecursive(node, relId, regs);
+    },
+    _thesaurifyRecursive : function(node, relId, regs) {
         var nodes = [];
         $.each($(node).get(), $.proxy(function(inx, el){
             $.each(el.childNodes, $.proxy(function(i, child){
                 if (child.childNodes.length && undefined === UNAPPROPRIATE_TAGS[child.tagName]) {
-                    this._thesaurifyRecursive(child, relId, terms);
+                    this._thesaurifyRecursive(child, relId, regs);
                 }
                 // Is it a non-empty text node?
                 if (undefined === child.tagName && child.nodeValue.length) {
@@ -554,7 +561,7 @@ Thesaurus.prototype = {
         }, this));
 
         $.each(nodes, $.proxy(function(idx, el) {
-            this._thesaurifyNode(el, relId, terms);
+            this._thesaurifyNode(el, relId, regs);
         }, this));
     }
 };
