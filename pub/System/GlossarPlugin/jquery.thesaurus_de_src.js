@@ -1,6 +1,6 @@
 // GlossarPlugin: deutsche Sprachdatei
 GlossarLang = {
-    synonyms: 'Synonyme',
-    alt_meanings: 'Andere Bedeutungen',
+    ambiguous: '(mehrere Bedeutungen)',
+    disambiguate: 'Für diesen Begriff sind mehrere Definitionen hinterlegt:',
     btn_edit_label: 'Bearbeiten'
 };

@@ -23,14 +23,13 @@ var lang = GlossarLang,
         'div.thesaurus .thesaurus-header a.term { color: white; font-weight: bold; }' +
         'div.thesaurus .thesaurus-header .term_editbtn { float: right; }' +
         'div.thesaurus .thesaurus-body { padding: 5px;  border: 1px solid #3C5F87; background-color: #fff; -moz-border-radius: 0 0 0 5px; -webkit-border-radius: 0 0 0 5px; }' +
-        'div.thesaurus .thesaurus-addendum { background-color: #ddd; margin-top: 1em; }' +
-        'div.thesaurus .thesaurus-box-title { font-weight: bold; }' +
-        'div.thesaurus .thesaurus-alts { margin-top: 0.5em; }' +
+        'div.thesaurus .thesaurus-addendum { background-color: #ddd; padding-bottom: 0.5em; }' +
         'div.thesaurus .thesaurus-alts ul { margin: 0; }' +
         'dfn.thesaurus { text-decoration: none; font-style: inherit; border-bottom: 1px dashed black; cursor: pointer; }' +
         '.hidden {display: none}',
     TOOLTIP_LOADING_TPL = '<img src="'+foswiki.getPreference('PUBURLPATH')+'/System/JQueryPlugin/images/spinner.gif">',
-    TOOLTIP_BODY_TPL = '<div class="thesaurus-header"><a class="term_editbtn foswikiButton">'+lang.btn_edit_label+'</a><a class="term"></a></div><div class="thesaurus-body"><div class="thesaurus-text"></div><div class="thesaurus-addendum"><div class="thesaurus-syns"><span class="thesaurus-box-title">'+lang.synonyms+': </span><div class="thesaurus-box-content"></div></div><div class="thesaurus-alts"><span class="thesaurus-box-title">'+lang.alt_meanings+':</span><div class="thesaurus-box-content"></div></div></div>';
+    TOOLTIP_DISAMBIG_TPL = '<div class="thesaurus-addendum"><div class="thesaurus-alts-title">'+lang.disambiguate+'</div><ul class="thesaurus-alts"></ul></div>',
+    TOOLTIP_BODY_TPL = '<div class="thesaurus-header"><a class="term_editbtn foswikiButton">'+lang.btn_edit_label+'</a><a class="term"></a></div><div class="thesaurus-body"><div class="thesaurus-text"></div></div>';
 
 var Collection = function() { };
 /**
@@ -94,7 +93,7 @@ Tooltip.normalize = function(node) {
     }
 };
 /**
- * Modifies contet of the requested tooltip
+ * Modifies content of the requested tooltip
  * @param event e
  * @param string text
  */
@@ -151,8 +150,6 @@ Tooltip.prototype = {
         this.boxes.title = this.boundingBox.find('a.term');
         this.boxes.body = this.boundingBox.find('div.thesaurus-body');
         this.boxes.text = this.boundingBox.find('div.thesaurus-text');
-        this.boxes.syns = this.boundingBox.find('div.thesaurus-syns .thesaurus-box-content');
-        this.boxes.alts = this.boundingBox.find('div.thesaurus-alts .thesaurus-box-content');
         this.boxes.edit = this.boundingBox.find('a.term_editbtn').hide();
         this.boxes.title.html($(this.currentTarget).text());
         this.boxes.text.html(TOOLTIP_LOADING_TPL);
@@ -226,16 +223,7 @@ Tooltip.prototype = {
             this.boxes.title.attr('title', text);
             return;
         }
-        if (text === null) {
-            this.boxes[box].empty().parent().hide();
-        } else {
-            this.boxes[box].parent().show();
-        }
-        if (typeof text == 'String') {
-            this.boxes[box].html(text);
-        } else {
-            this.boxes[box].empty().append(text);
-        }
+        this.boxes[box].html(text);
     },
     setLink : function(href) {
         this.boxes.title.attr('href', href);
@@ -374,59 +362,10 @@ Thesaurus.prototype = {
             topics = {};
 
         var o = this;
-        // Click handler for synset links generated in bottom section
-        var synsetClick = function(ev) {
-            // Fetching another definition for the same node, so get rid of cache
-            delete o.cache[term];
-            // Make sure the pointer doesn't suddenly jump outside the tooltip
-            var box = $(instance.boxes.body);
-            box.css('min-height', box.height()+'px');
-            o._fetchTooltip(e, instance, term, ev.data.topic);
-            ev.preventDefault();
-            return false;
-        };
 
-        // Work horse: cobble together all the things to fill into the tooltip
-        var syns = $('<ul></ul>');
-        var alts = syns.clone();
+        // Cobble together all the things to fill into the tooltip
         var linkbase = foswiki.getPreference('SCRIPTURLPATH')+'/view'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+this.options.web;
-        // Alternative entries
-        if (this.terms[term].length > 1) {
-            $.each(this.terms[term], function(_idx, topic) {
-                if (topic == data.topic) return;
-                // Generate synset
-                var link = $('<a href="#"></a>');
-                var terms = o.topics[topic];
-                if (o.options.caseSensitive == 'off') terms = $.map(terms, function(v) { return o._displayTerm(v); });
-                link.text(terms.join(', '));
-                link.attr('title', topic);
-                link.on('click', {topic: topic}, synsetClick);
-                var li = $('<li></li>');
-                li.append(link);
-                alts.append(li);
-            });
-        } else {
-            alts = null;
-        }
-        if (this.topics[data.topic].length > 1) {
-            var showterms = [];
-            $.each(this.topics[data.topic], function(_idx, aTerm) {
-                if (aTerm == term) return;
-                if (o.options.caseSensitive == 'off') aTerm = o._displayTerm(aTerm);
-                showterms.push(aTerm);
-            });
-            syns = showterms.join(', ');
-        } else {
-            syns = null;
-        }
-        var content = {
-            title: this._displayTerm(term),
-            titlehint: data.topic,
-            text: data.text,
-            alts: alts,
-            syns: syns
-        };
-        Tooltip.setContent(e, content);
+        Tooltip.setContent(e, {text: data.text});
         instance.setLink(linkbase +'/'+ data.topic);
         if (data.edit) {
             instance.setEditLink(foswiki.getPreference('SCRIPTURLPATH')+'/edit'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+this.options.web+'/'+data.topic);
@@ -435,18 +374,23 @@ Thesaurus.prototype = {
         }
         this._processOverlayTooltip(instance.boxes.text, e.currentTarget, this._generateTermsIdx(topics));
     },
+    // Takes a list of terms in internal representation and creates a string
+    // representation formatted for displaying
+    _makeSynset : function(terms) {
+        var o = this;
+        return $.map(terms, function(t) { return o._displayTerm(t); }).join(', ');
+    },
     _fetchTooltip : function(e, instance, term, topic) {
-        Tooltip.setContent(e, {title: this._displayTerm(term), text: TOOLTIP_LOADING_TPL, syns: null, alts: null});
+        Tooltip.setContent(e, {title: this._makeSynset(this.topics[topic]), titlehint: topic, text: TOOLTIP_LOADING_TPL});
         instance.setEditLink(null);
-        var fromcache = this.cache[term];
+        var fromcache = this.cache[topic];
         if (undefined !== fromcache)
             return this._populateTooltip(e, instance, fromcache, term);
 
-        if (undefined === topic) topic = this.terms[term][0];
         var o = this;
         $.getScript(this.options.controller + "?thetopic="+ topic, function() {
                 fromcache = o._processResponse($.callbackData);
-                o.cache[term] = fromcache;
+                o.cache[topic] = fromcache;
                 o._populateTooltip(e, instance, fromcache, term);
         });
     },
@@ -458,7 +402,37 @@ Thesaurus.prototype = {
         var _onMouseOverDelayed = function() {
             var instance = Tooltip.show(e);
             var term = this._internalTerm($(e.currentTarget).text());
-            this._fetchTooltip(e, instance, term);
+            var topics = this.terms[term];
+            var forceTopic = $(e.currentTarget).parent().attr('data-glossar');
+            if (forceTopic) topics = [forceTopic];
+            var o = this;
+            if (topics.length == 1)
+                return this._fetchTooltip(e, instance, term, topics[0]);
+
+            // Overloading detected, show disambiguation
+            Tooltip.setContent(e, {title: this._displayTerm(term) +" <em>"+ lang.ambiguous +"</em>", text: TOOLTIP_DISAMBIG_TPL});
+
+            // Click handler for synset links generated in bottom section
+            var synsetClick = function(ev) {
+                // Make sure the pointer doesn't suddenly jump outside the tooltip
+                var box = $(instance.boxes.body);
+                box.css('min-height', box.height()+'px');
+                o._fetchTooltip(e, instance, term, ev.data.topic);
+                ev.preventDefault();
+                return false;
+            };
+
+            var alts = instance.boxes.text.find('.thesaurus-alts');
+            $.each(topics, function(_idx, topic) {
+                // Generate synset
+                var link = $('<a href="#"></a>');
+                link.text(o._makeSynset(o.topics[topic]));
+                link.attr('title', topic);
+                link.on('click', {topic: topic}, synsetClick);
+                var li = $('<li></li>');
+                li.append(link);
+                alts.append(li);
+            });
         }
         this.timer = window.setTimeout($.proxy(_onMouseOverDelayed, this), this.options.popindelay);
     },

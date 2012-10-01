@@ -1,64 +1,28 @@
 %META:TOPICINFO{author="BaseUserMapping_333" comment="reprev" date="1339429406" format="1.1" reprev="8" version="8"}%
 %META:TOPICPARENT{name="WebHome"}%
-<div class="GlossaryDisabledEntries">
-%TWISTY{ 
-    id="GlossaryDisabledEntries" 
-    firststart="hide" 
-    remember="on" 
-        noscript="show"
-    showlink="%MAKETEXT{"Disabled glossary entries"}%" 
-    hidelink="%MAKETEXT{"Disabled glossary entries"}%" 
-        showimgleft="%ICONURLPATH{arrow-right}%"
-        hideimgleft="%ICONURLPATH{arrow-down}%" 
-        linkclass="patternTwistyButton" 
-}%
+
+---++ %MAKETEXT{"Glossary entries"}%
 <noautolink>
 %MAKEINDEX{
   "%SEARCH{
   type="query"
-  "form.name = 'GlossarForm' AND NOT Enabled = 'Enabled'%GLOSSARSEARCHOPTS%"
+  "form.name = 'GlossarForm'%GLOSSARSEARCHOPTS%"
   web="Glossar"
-  order="formfield(keywords)"
   nonoise="on"
+  format="$percntFORMATLIST{\"$formfield(keywords)\" format=\"$1	$topic\" separator=\";\"}$percnt"
   excludetopic="GlossarTemplate"
-  format="$topic $formfield(keywords)"
   separator=";"
   footer=""
   header=""
 }%"
-  pattern="([^ ]*)(.*)"
+  pattern="([^\t]*)\t([^\t]*)"
+  unique="on"
   split=";"
   cols="4"
   header="$anchors"
-  format="[[Glossar.$1][$2]]"
+  format="<a class=\"glossartag\" href=\"%SCRIPTURL{view}%/%WEB%/$2\" data-glossar=\"$2\">$1</a>"
   sort="nocase"
-  footer="$n$n<span class='foswikiAlert'>$count</span> topics found"
-}%
-</noautolink>
-%ENDTWISTY%
-</div>
-
----++ %MAKETEXT{"Keywords"}%
-<noautolink>
-%MAKEINDEX{
-  "%SEARCH{
-  type="query"
-  "form.name = 'GlossarForm' AND Enabled = 'Enabled'%GLOSSARSEARCHOPTS%"
-  web="Glossar"
-  nonoise="on"
-  format="$formfield(keywords)"
-  separator=","
   footer=""
-  header=""
-}%"
-  pattern="(.*)"
-  unique="on"
-  split=","
-  cols="4"
-  header="$anchors"
-  format="<span class='glossartag'>$1</span>"
-  sort="nocase"
-  footer="$n$n<span class='foswikiAlert'>$count</span> topics found"
 }%
 </noautolink>
 
@@ -76,7 +40,7 @@
     <input type="hidden" name="Enabled" value="Enabled" />
     <table cellpadding="0" cellspacing="0" style="width: 100%">
       <tr><td>
-        %MAKETEXT{"Keywords:"}%<input type="text" class="foswikiInputField jqTextboxList" size="12" name="keywords" value="" id="keywords"/><br />
+        %MAKETEXT{"Glossary term:"}%<input type="text" class="foswikiInputField jqTextboxList" size="12" name="keywords" value="" id="keywords"/><br />
       </td></tr><tr><td>
         %MAKETEXT{"Description:"}%<br /><textarea name="text" style="width: 100%;" rows="9"></textarea>
       </td></tr><tr><td>

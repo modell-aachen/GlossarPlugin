@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GlossarPlugin 2.0\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: 2012-09-14 16:21+0200\n"
+"PO-Revision-Date: 2012-09-17 17:33+0200\n"
 "Last-Translator: Jan Krüger <krueger@modell-aachen.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -26,13 +26,12 @@ msgstr "Neuen Glossareintrag erstellen"
 msgid "Disabled glossary entries"
 msgstr "Deaktivierte Glossareinträge"
 
-#: data/Sandbox/GlossarIndex.txt:26
-msgid "Keywords"
-msgstr "Schlagworte"
+msgid "Glossary entries"
+msgstr "Glossareinträge"
 
 #: data/Sandbox/GlossarIndex.txt:68
-msgid "Keywords:"
-msgstr "Schlagworte:"
+msgid "Glossary term:"
+msgstr "Glossarbegriff:"
 
 msgid "Description:"
 msgstr "Beschreibung:"

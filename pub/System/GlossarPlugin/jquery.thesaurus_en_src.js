@@ -1,7 +1,7 @@
 // GlossarPlugin: English language file
 GlossarLang = {
-    synonyms: 'Synonyms',
-    alt_meanings: 'Other meanings',
+    ambiguous: '(multiple meanings)',
+    disambiguate: 'There are several definitions for this term:',
     btn_edit_label: 'Edit'
 };
 
