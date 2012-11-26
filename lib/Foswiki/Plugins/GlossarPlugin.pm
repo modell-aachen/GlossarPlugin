@@ -248,10 +248,33 @@ sub _generateNewId {
         {ignorepermissions => 1});
 }
 
+=begin TML
+
+---++ afterRenameHandler( $oldWeb, $oldTopic, $oldAttachment, $newWeb, $newTopic, $newAttachment )
+
+   * =$oldWeb= - name of old web
+   * =$oldTopic= - name of old topic (empty string if web rename)
+   * =$oldAttachment= - name of old attachment (empty string if web or topic rename)
+   * =$newWeb= - name of new web
+   * =$newTopic= - name of new topic (empty string if web rename)
+   * =$newAttachment= - name of new attachment (empty string if web or topic rename)
+
+This handler is called just after the rename/move/delete action of a web, topic or attachment.
+
+*Since:* Foswiki::Plugins::VERSION = '2.0'
+
+=cut
+
 # XXX KVP state change does not work
 sub afterRenameHandler {
-# XXX It seems there is no beforeRenameHandler so I see no way to check, if tags have changed.
-# So I'm going to generate a new ID unconditionally
+    my ( $oldWeb, $oldTopic, $oldAttachment,
+         $newWeb, $newTopic, $newAttachment ) = @_;
+
+    my $gweb = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb} || '';
+    return if($oldWeb ne $gweb && $newWeb ne $gweb);
+
+    # XXX It seems there is no beforeRenameHandler so I see no way to check, if tags have changed.
+    # So I'm going to generate a new ID unconditionally
     _generateNewId();
 }
 
