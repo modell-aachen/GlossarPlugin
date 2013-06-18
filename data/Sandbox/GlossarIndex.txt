@@ -6,7 +6,7 @@
 %MAKEINDEX{
   "%SEARCH{
   type="query"
-  "form.name = 'GlossarForm'%GLOSSARSEARCHOPTS%"
+  "form.name ~ '*GlossarForm'%GLOSSARSEARCHOPTS%"
   web="Glossar"
   nonoise="on"
   format="$percntFORMATLIST{\"$formfield(keywords)\" format=\"$1	$topic\" separator=\";\"}$percnt"

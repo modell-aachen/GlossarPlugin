@@ -38,7 +38,7 @@ sub _getList {
       Foswiki::Func::expandCommonVariables(<<SEARCH, 'GlossarIndex', 'Glossar');
 %SEARCH{
 type="query"
-"form.name = 'GlossarForm' AND Enabled = 'Enabled'$addQuery"
+"form.name ~ '*GlossarForm' AND Enabled = 'Enabled'$addQuery"
 web="$glossar"
 nonoise="on"
 format="\$topic\t\$formfield(keywords)"
