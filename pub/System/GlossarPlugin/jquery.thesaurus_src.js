@@ -450,7 +450,11 @@ Thesaurus.prototype = {
      * @param string file
      */
     cssLoad : function(file) {
+        if(file) {
+            $('body').append('<style type="text/css">@import url("'+file+'");</style>');
+        } else {
             $('body').append('<style>' + DEFAULTCSS_TPL + '</style>');
+        }
     },
     /**
      * Indicates message when an error occured retrieving data from seerver side

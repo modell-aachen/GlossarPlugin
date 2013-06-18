@@ -24,6 +24,9 @@ $Foswiki::cfg{Extensions}{GlossarPlugin}{Preload} = 400;
 # <ul><li>on: A rose is a rose is a rose... mark all definitions</li><li>off: do not mark any definitions</li><li>single: mark all definitions except those whose definition is shown in the popup</li></ul>
 $Foswiki::cfg{Extensions}{GlossarPlugin}{RecursivePopups} = 'off';
 # **STRING**
+# Custom css file for popups. Leave empty for defaults.
+$Foswiki::cfg{Extensions}{GlossarPlugin}{Css} = '';
+# **STRING**
 # Error message if a definition has not been found (usually that means a definition has been removed since the page was rendered).
 $Foswiki::cfg{Extensions}{GlossarPlugin}{NotFoundMsg} = '';
 # **STRING**
