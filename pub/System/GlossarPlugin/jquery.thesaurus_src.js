@@ -286,16 +286,19 @@ Tooltip.prototype = {
 	else
             scrollLeft = document.body.scrollLeft;
 
-
-	if (rCornerW < this.boundingBox.width()) // Original: this.boundingBox.offsetWidth
+	if (rCornerW < this.boundingBox.width()){ // Original: this.boundingBox.offsetWidth
             left = scrollLeft + e.clientX - this.boundingBox.width();
-	else
+            if( left < scrollLeft ) left = scrollLeft;
+        } else {
             left = scrollLeft + e.clientX;
+        }
 
-	if (bCornerH < this.boundingBox.height()) // Original: this.boundingBox.offsetHeight
+	if (bCornerH < this.boundingBox.height()){ // Original: this.boundingBox.offsetHeight
             top = scrollTop + e.clientY - this.boundingBox.height();
-	else
+            if(top < scrollTop) top = scrollTop;
+        } else {
             top = scrollTop + e.clientY;
+        }
 
         this.boundingBox.css("top", (top)+"px");
         this.boundingBox.css("left", (left)+"px");
