@@ -375,8 +375,8 @@ Thesaurus.prototype = {
         } else {
             instance.setEditLink(null);
         }
-        if (data.class) {
-            instance.addClass(data.class);
+        if (data.cssclass) {
+            instance.addClass(data.cssclass);
         }
         this._processOverlayTooltip(instance.boxes.text, e.currentTarget, this._generateTermsIdx(topics));
     },

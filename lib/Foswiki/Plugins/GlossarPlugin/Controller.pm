@@ -86,14 +86,14 @@ sub _getTopic {
     $re = Foswiki::Func::expandCommonVariables($text, $topic, $glossar, $meta);
     $re = Foswiki::Func::renderText($re, $glossar);
 
-    my $class = $meta->get( 'FIELD', 'GlossarClass' );
-    $class = ( $class ) ? $class->{value} : '';
+    my $cssclass = $meta->get( 'FIELD', 'GlossarClass' );
+    $cssclass = ( $cssclass ) ? $cssclass->{value} : '';
 
     return {
         topic => $topic,
         text => $re,
         edit => $canChange,
-        class => $class
+        cssclass => $cssclass
     };
 }
 
