@@ -458,7 +458,11 @@ Thesaurus.prototype = {
     cssLoad : function(file) {
         $('body').append('<style>' + DEFAULTCSS_TPL + '</style>');
         if(file) {
-            $('body').append('<style type="text/css">@import url("'+file+'");</style>');
+            if(document.createStyleSheet) {
+                document.createStyleSheet(file);
+            } else {
+                $('body').append('<style type="text/css">@import url("'+file+'");</style>');
+            }
         }
     },
     /**
