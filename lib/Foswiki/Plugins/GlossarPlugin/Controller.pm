@@ -86,10 +86,14 @@ sub _getTopic {
     $re = Foswiki::Func::expandCommonVariables($text, $topic, $glossar, $meta);
     $re = Foswiki::Func::renderText($re, $glossar);
 
+    my $class = $meta->get( 'FIELD', 'GlossarClass' );
+    $class = ( $class ) ? $class->{value} : '';
+
     return {
         topic => $topic,
         text => $re,
         edit => $canChange,
+        class => $class
     };
 }
 
@@ -118,6 +122,7 @@ sub response {
     my $status = defined($re[0]) ? 'ok' : $re[1];
     my $payload = defined($re[0]) ? $re[0] : [];
     my $errmsg = defined($re[0]) ? '' : $re[2];
+    my $class = $re[3] || '';
 
     my $resp = "jQuery.callbackData="
       . JSON->new->encode({

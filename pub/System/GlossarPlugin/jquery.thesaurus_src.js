@@ -234,6 +234,9 @@ Tooltip.prototype = {
 
         this.boxes.edit.attr('href', href).show();
     },
+    addClass : function(newclass) {
+        this.boundingBox.addClass(newclass);
+    },
     /**
      * Cancels request to destory the tooltip
      * @see delayedDestruction
@@ -371,6 +374,9 @@ Thesaurus.prototype = {
             instance.setEditLink(foswiki.getPreference('SCRIPTURLPATH')+'/edit'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+this.options.web+'/'+data.topic);
         } else {
             instance.setEditLink(null);
+        }
+        if (data.class) {
+            instance.addClass(data.class);
         }
         this._processOverlayTooltip(instance.boxes.text, e.currentTarget, this._generateTermsIdx(topics));
     },
