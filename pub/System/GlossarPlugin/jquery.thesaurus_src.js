@@ -166,6 +166,7 @@ Tooltip.prototype = {
         } else {
             this.boundingBox.removeClass("hidden");
         }
+        this.adjust();
     },
     /**
      * Applies effect when the tooltip is appearing
@@ -349,6 +350,7 @@ Thesaurus.prototype = {
     _processOverlayTooltip : function(tooltipNode, parentTooltipNode, terms) {
         if (tooltipNode) {
             this._thesaurify($(tooltipNode).find('.thesaurus-text')[0], $(parentTooltipNode).attr('id'), terms);
+            this.adjust();
             this.bindUI(tooltipNode);
         }
     },
