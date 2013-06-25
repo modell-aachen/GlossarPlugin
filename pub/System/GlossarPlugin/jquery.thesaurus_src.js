@@ -256,7 +256,7 @@ Tooltip.prototype = {
      */
     delayedDestruction: function() {
         this.applyOnParent('delayedDestruction');
- 	this.timer = window.setTimeout($.proxy(this.destroy, this), this.options.delay);
+        this.timer = window.setTimeout($.proxy(this.destroy, this), this.options.delay);
     },
     /**
      * Removes Tooltip HTML container and instance ofthe class from the collection
@@ -271,29 +271,29 @@ Tooltip.prototype = {
     adjust : function() {
         var e = this.options.event, left, top;
 
-	var rCornerW = $(window).width() - e.clientX;
-	var bCornerH = $(window).height() - e.clientY;
+        var rCornerW = $(window).width() - e.clientX;
+        var bCornerH = $(window).height() - e.clientY;
 
-	// Compliance with HTML 4/XHTML
-	if(document.documentElement && document.documentElement.scrollTop)
+        // Compliance with HTML 4/XHTML
+        if(document.documentElement && document.documentElement.scrollTop)
             scrollTop = document.documentElement.scrollTop;
-	else
+        else
             scrollTop = document.body.scrollTop;
 
-	// Compliance with HTML 4/XHTML
-	if(document.documentElement && document.documentElement.scrollLeft)
+        // Compliance with HTML 4/XHTML
+        if(document.documentElement && document.documentElement.scrollLeft)
             scrollLeft = document.documentElement.scrollLeft;
-	else
+        else
             scrollLeft = document.body.scrollLeft;
 
-	if (rCornerW < this.boundingBox.width()){ // Original: this.boundingBox.offsetWidth
+        if (rCornerW < this.boundingBox.width()){ // Original: this.boundingBox.offsetWidth
             left = scrollLeft + e.clientX - this.boundingBox.width();
             if( left < scrollLeft ) left = scrollLeft;
         } else {
             left = scrollLeft + e.clientX;
         }
 
-	if (bCornerH < this.boundingBox.height()){ // Original: this.boundingBox.offsetHeight
+        if (bCornerH < this.boundingBox.height()){ // Original: this.boundingBox.offsetHeight
             top = scrollTop + e.clientY - this.boundingBox.height();
             if(top < scrollTop) top = scrollTop;
         } else {
