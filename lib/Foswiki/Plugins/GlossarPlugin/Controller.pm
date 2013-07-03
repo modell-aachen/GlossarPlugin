@@ -131,7 +131,7 @@ sub response {
             payload  => $payload,
       });
     $response->header(
-        '-Cache-Control' => 'max-age=36000, public',
+        '-Cache-Control' => 'max-age=36000, private',
         '-Expires'       => '+12h',
     );
     return $resp;

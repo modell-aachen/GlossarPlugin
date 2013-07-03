@@ -516,7 +516,7 @@ Thesaurus.prototype = {
     bootstrap : function() {
         var o = this;
         $.ajax({
-                url:this.options.controller+ "?" + this.options.id,
+                url:this.options.controller+ "?" + this.options.id + "&" + encodeURI(foswiki.getPreference('USERNAME')),
                 dataType: "script",
                 success: $.proxy(function(){
                   this.topics = this._processResponse($.callbackData);
