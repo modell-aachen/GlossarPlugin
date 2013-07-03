@@ -400,6 +400,9 @@ Thesaurus.prototype = {
         var o = this;
         $.getScript(this.options.controller + "?thetopic="+ topic, function() {
                 fromcache = o._processResponse($.callbackData);
+                if(fromcache.error) {
+                    fromcache = {text: '<b><span class="foswikiAlert">'+fromcache.error+'</b></span>', edit: 0};
+                }
                 o.cache[topic] = fromcache;
                 o._populateTooltip(e, instance, fromcache, term);
         });
@@ -482,8 +485,8 @@ Thesaurus.prototype = {
             errorMsg = data.errorMsg;
         }
         if (null !== errorMsg) {
-            alert(errorMsg);
-            return null;
+            if(console && console.log) console.log(errorMsg);
+            return {error: errorMsg};
         }
         return data.payload;
     },
@@ -517,6 +520,7 @@ Thesaurus.prototype = {
                 dataType: "script",
                 success: $.proxy(function(){
                   this.topics = this._processResponse($.callbackData);
+                  if (this.topics.error) return;
                   // Downcase the terms for case-insensitive lookups
                   if (this.options.caseSensitive == 'off') $.each(this.topics, function(idx, termset) {
                       o.topics[idx] = $.map(termset, function(val) {
