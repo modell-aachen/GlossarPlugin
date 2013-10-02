@@ -1,5 +1,6 @@
 # Release manifest for GlossarPlugin
 data/System/GlossarPlugin.txt 0644 Documentation
+data/System/GlossaryPopupTemplate.txt 0644 View template for popups
 data/Sandbox/GlossarForm.txt 0644 Form
 data/Sandbox/GlossarTemplate.txt 0644 Form
 data/Sandbox/GlossarIndex.txt 0644 Example for index of all terms.

@@ -11,6 +11,18 @@ prefer.
 %TOC%
 
 ---++ Usage
+---+++ Defining a custom =VIEW_TEMPLATE= for entries
+You can define a custom =VIEW_TEMPLATE= for entries by naming it according to the form attached to the entry (eg. if you use _GlossaryForm_ name your template _GlossaryViewTemplate_). This template should be based on =GlossaryPopup= (which is based on =view=).%BR%
+Example:
+<pre>
+%%NOP%TMPL:INCLUDE{"GlossaryPopup"}%
+
+%%NOP%TMPL:DEF{"content"}%This is how %%NOP%QUERY{"keywords"}% was defined:
+
+%%NOP%TEXT%
+%%NOP%TMPL:END%
+</pre>
+%I% If you need to have different layouts for a normal view and a popup, you should redefine =PopupContent= instead of =content=.
 
 ---++ Examples
 

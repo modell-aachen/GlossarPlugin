@@ -84,7 +84,23 @@ sub _getTopic {
 
     # generate text for popup from found topic
     my ($meta, $text) = Foswiki::Func::readTopic($glossar, $topic);
-    $re = Foswiki::Func::expandCommonVariables($text, $topic, $glossar, $meta);
+    # try to emulate automatic selection of viewtemplate for form
+    my $tmpl;
+    my $view = $meta->getFormName();
+    if ( $view ) {
+        $view =~ s#Form$#View#;
+        if ( Foswiki::Func::topicExists($glossar, "${view}Template") ) {
+            Foswiki::Func::loadTemplate($view, undef, $glossar);
+            $tmpl = Foswiki::Func::expandTemplate('PopupContent');
+        }
+    }
+    unless ( $tmpl ) {
+        # fallback to standard template
+        Foswiki::Func::loadTemplate('GlossaryPopup', undef, $glossar);
+        $tmpl = Foswiki::Func::expandTemplate('PopupContent');
+    }
+    $tmpl =~ s#%TEXT%#$text#;
+    $re = Foswiki::Func::expandCommonVariables($tmpl, $topic, $glossar, $meta) || ' ';
     $re = Foswiki::Func::renderText($re, $glossar);
 
     my $cssclass = $meta->get( 'FIELD', 'GlossarClass' );
