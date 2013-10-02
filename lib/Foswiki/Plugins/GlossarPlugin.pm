@@ -29,7 +29,7 @@ use Foswiki::Plugins ();  # For the API version
 
 our $VERSION = '$Rev: 8536 $';
 
-our $RELEASE = '0.9.12';
+our $RELEASE = '0.9.13';
 
 our $SHORTDESCRIPTION = 'Creates a pop-up glossar for your wiki.';
 
