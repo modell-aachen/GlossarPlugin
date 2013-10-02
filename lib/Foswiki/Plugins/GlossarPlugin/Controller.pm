@@ -54,6 +54,7 @@ SEARCH
           s/^\s*(.+?)\s*$/$1/gs;  # trim on both sides, probably unnecessarily
         next if !$entry;
         my ($topic, $kws) = split(/\t/, $entry, 2);
+        next unless defined $kws;
         my @kws = split(/\s*,\s*/, $kws);
         $re->{$topic} = \@kws;
     }
