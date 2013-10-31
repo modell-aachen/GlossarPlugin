@@ -111,7 +111,7 @@ jQuery(function() { jQuery.Thesaurus({
 });});//--></script>
 SCRIPT
     Foswiki::Plugins::JQueryPlugin::Plugins::createPlugin("Glossar");
-    Foswiki::Func::addToZone('script', "GLOSSARPLUGIN", $script, '');
+    Foswiki::Func::addToZone('script', "GLOSSARPLUGIN", $script, 'JQUERYPLUGIN');
     # Plugin correctly initialized
     return 1;
 }
