@@ -1,0 +1,3 @@
+%TMPL:INCLUDE{"view"}%
+
+%TMPL:DEF{"PopupContent"}%<div class="foswikiTopic">%TMPL:P{"content"}%</div>%TMPL:END%

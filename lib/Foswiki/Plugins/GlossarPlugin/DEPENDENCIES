@@ -1,0 +1,2 @@
+# Dependencies for GlossarPlugin
+Foswiki::Plugins::JQueryPlugin,>=4.33,perl,Requires jQuery

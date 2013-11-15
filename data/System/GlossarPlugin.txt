@@ -1,0 +1,48 @@
+---+!! !GlossarPlugin
+<!--
+One line description, required for extensions repository catalog.
+BuildContrib will fill in the SHORTDESCRIPTION with the value of
+$SHORTDESCRIPTION from the .pm module, or you can redefine it here if you
+prefer.
+   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
+-->
+%SHORTDESCRIPTION%
+
+%TOC%
+
+---++ Usage
+---+++ Defining a custom =VIEW_TEMPLATE= for entries
+You can define a custom =VIEW_TEMPLATE= for entries by naming it according to the form attached to the entry (eg. if you use _GlossaryForm_ name your template _GlossaryViewTemplate_). This template should be based on =GlossaryPopup= (which is based on =view=).%BR%
+Example:
+<pre>
+%%NOP%TMPL:INCLUDE{"GlossaryPopup"}%
+
+%%NOP%TMPL:DEF{"content"}%This is how %%NOP%QUERY{"keywords"}% was defined:
+
+%%NOP%TEXT%
+%%NOP%TMPL:END%
+</pre>
+%I% If you need to have different layouts for a normal view and a popup, you should redefine =PopupContent= instead of =content=.
+
+---++ Examples
+
+---++ Installation Instructions
+
+%$INSTALL_INSTRUCTIONS%
+
+---++ Info
+
+Many thanks to the following sponsors for supporting this work:
+   * Acknowledge any sponsors here
+
+|  Author(s): | |
+|  Copyright: | &copy; |
+|  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License)]] |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
+|  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  Dependencies: | %$DEPENDENCIES% |
+|  Home page: | http://extensions.open-quality.com/bin/view/Extensions/GlossarPlugin |
+|  Support: | http://extensions.open-quality.com/bin/view/Support/GlossarPlugin |
+
+<!-- Do _not_ attempt to edit this topic; it is auto-generated. -->

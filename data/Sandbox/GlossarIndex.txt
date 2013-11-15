@@ -1,0 +1,52 @@
+%META:TOPICINFO{author="BaseUserMapping_333" comment="reprev" date="1339429406" format="1.1" reprev="8" version="8"}%
+%META:TOPICPARENT{name="WebHome"}%
+
+---++ %MAKETEXT{"Glossary entries"}%
+<noautolink>
+%MAKEINDEX{
+  "%SEARCH{
+  type="query"
+  "form.name ~ '*GlossarForm'%GLOSSARSEARCHOPTS%"
+  web="Glossar"
+  nonoise="on"
+  format="$percntFORMATLIST{\"$formfield(keywords)\" format=\"$1	$topic\" separator=\";\"}$percnt"
+  excludetopic="GlossarTemplate"
+  separator=";"
+  footer=""
+  header=""
+}%"
+  pattern="([^\t]*)\t([^\t]*)"
+  unique="on"
+  split=";"
+  cols="4"
+  header="$anchors"
+  format="<a class=\"glossartag\" href=\"%SCRIPTURL{view}%/%WEB%/$2\" data-glossar=\"$2\">$1</a>"
+  sort="nocase"
+  footer=""
+}%
+</noautolink>
+
+---++ %MAKETEXT{"Create new glossary entry"}%
+%JQREQUIRE{"ui::dialog, ui::button, textboxlist"}%
+<a href="#glossardialog" class="jqUIDialogLink foswikiButton">%MAKETEXT{"Create new glossary entry"}%</a>
+%STARTSECTION{"glossardialog"}%
+<div id="glossardialog" title="%MAKETEXT{"Create new glossary entry"}%" class="jqUIDialog {draggable:true, resizable: true, height:400, width:600}">
+  <form action='%SCRIPTURLPATH{"save"}%/%WEB%' method="post" id="createEntryForm">
+    <input type="hidden" name="t" value="%GMTIME{"$epoch"}%" />
+    <input type="hidden" name="redirectto" value="%WEB%/%TOPIC%#" />
+    <input type="hidden" name="onlynewtopic" value="1" />
+    <input type="hidden" name="templatetopic" value="%WEB%.GlossarTemplate" />
+    <input type="hidden" name="topic" value="%WEB%.GlossarAUTOINC0000" />
+    <input type="hidden" name="Enabled" value="Enabled" />
+    <table cellpadding="0" cellspacing="0" style="width: 100%">
+      <tr><td>
+        %MAKETEXT{"Glossary term:"}%<input type="text" class="foswikiInputField jqTextboxList" size="12" name="keywords" value="" id="keywords"/><br />
+      </td></tr><tr><td>
+        %MAKETEXT{"Description:"}%<br /><textarea name="text" style="width: 100%;" rows="12"></textarea>
+      </td></tr><tr><td>
+        <a class='jqUIDialogSubmit jqUIDialogButton'>%MAKETEXT{"Create new glossary entry"}%</a>
+      </td></tr>
+    </table>
+  </form>
+</div>
+%ENDSECTION{"glossardialog"}%

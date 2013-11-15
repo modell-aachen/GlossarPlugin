@@ -1,0 +1,4 @@
+%META:TOPICINFO{author="BaseUserMapping_333" comment="pending" date="1338286939" format="1.1" version="2"}%
+| *Name* | *Type* | *Size* | *Values* | *Tooltip message* | *Attributes* |
+| Enabled | checkbox | 1 | Enabled | If this Item will show. | |
+| keywords | textboxlist | 20 | | Keywords this topic defines. | |
