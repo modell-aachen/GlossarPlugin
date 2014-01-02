@@ -10,6 +10,17 @@ prefer.
 
 %TOC%
 
+---++ Installation
+   * Before activating the plugin create a web for glossary entries, eg. =Glossary= (if you configure and activate _GlossaryPlugin_ first you will not be able to write to that web - when this happens deactivate _GlossaryPlugin_ in _configure_).
+   * Copy =Sandbox.GlossarForm=, =Sandbox.GlossarIndex= and =Sandbox.GlossarTemplate= to your glossary web.
+   * In _configure_:
+      * Under _Extensions/GlossarPlugin_: Enter your glossary web into ={Extensions}{GlossarPlugin}{GlossarWeb}=
+      * Under _Extensions/Extension operation and maintenance_: Enable ={Plugins}{GlossarPlugin}{Enabled}=
+   * In each _WebPreferences/SitePreferences_ activate glossary by setting (look out: no trailing whitespaces!):<pre>
+%NOP%   * Set GLOSSAR = 1
+</pre>
+   * (eventually redirect your WebHome to GlossarIndex: =%%NOP%REDIRECT{"GlossarIndex"}%=)
+
 ---++ Usage
 ---+++ Defining a custom =VIEW_TEMPLATE= for entries
 You can define a custom =VIEW_TEMPLATE= for entries by naming it according to the form attached to the entry (eg. if you use _GlossaryForm_ name your template _GlossaryViewTemplate_). This template should be based on =GlossaryPopup= (which is based on =view=).%BR%
