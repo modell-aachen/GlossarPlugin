@@ -7,7 +7,7 @@
   "%SEARCH{
   type="query"
   "form.name ~ '*GlossarForm'%GLOSSARSEARCHOPTS%"
-  web="Glossar"
+  web="%WEB%"
   nonoise="on"
   format="$percntFORMATLIST{\"$formfield(keywords)\" format=\"$1	$topic\" separator=\";\"}$percnt"
   excludetopic="GlossarTemplate"
