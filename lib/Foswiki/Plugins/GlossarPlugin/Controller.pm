@@ -100,8 +100,10 @@ sub _getTopic {
         $tmpl = Foswiki::Func::expandTemplate('PopupContent');
     }
     $tmpl =~ s#%TEXT%#$text#;
+    Foswiki::Func::pushTopicContext($glossar, $topic);
     $re = Foswiki::Func::expandCommonVariables($tmpl, $topic, $glossar, $meta) || ' ';
     $re = Foswiki::Func::renderText($re, $glossar);
+    Foswiki::Func::popTopicContext();
 
     my $cssclass = $meta->get( 'FIELD', 'GlossarClass' );
     $cssclass = ( $cssclass ) ? $cssclass->{value} : '';
