@@ -104,6 +104,10 @@ sub _getTopic {
     $re = Foswiki::Func::expandCommonVariables($tmpl, $topic, $glossar, $meta) || ' ';
     $re = Foswiki::Func::renderText($re, $glossar);
     Foswiki::Func::popTopicContext();
+    if($Foswiki::cfg{Plugins}{SafeWikiPlugin}{Enabled}) {
+        Foswiki::Plugins::SafeWikiPlugin::completePageHandler($re, 'Content-type: text/html');
+    }
+    Foswiki::Func::getContext()->{'OverrideSafeWikiPlugin'} = 1;
 
     my $cssclass = $meta->get( 'FIELD', 'GlossarClass' );
     $cssclass = ( $cssclass ) ? $cssclass->{value} : '';
