@@ -613,10 +613,10 @@ $.fn.applyThesaurus = function() {
 $.Thesaurus = function(options) {
     $.extend(Thesaurus.options, options);
 };
-// Authomaticaly applied when DOM is ready
-$(document).ready(function(){
+// Call this function to initialize the thesaurus.
+// You will need to set the required options (controller etc.) prior to initialisation.
+$.Thesaurus.init = function() {
     new Thesaurus(Thesaurus.options);
-
-});
+};
 
 })( jQuery );

@@ -97,7 +97,7 @@ sub initPlugin {
         'Foswiki::Plugins::GlossarPlugin::JQuery');
     my $script = <<SCRIPT;
 <script type="text/javascript"><!--
-jQuery(function() { jQuery.Thesaurus({
+jQuery(function(\$) { \$.Thesaurus({
     caseSensitive: '$caseSensitive',
     containers: ['$containers'],
     web: '$glossarWeb',
@@ -108,10 +108,11 @@ jQuery(function() { jQuery.Thesaurus({
     popindelay: $popindelay,
     preload: $preload,
     pMode: '$pMode'
-});});//--></script>
+});
+\$.Thesaurus.init();});//--></script>
 SCRIPT
     Foswiki::Plugins::JQueryPlugin::Plugins::createPlugin("Glossar");
-    Foswiki::Func::addToZone('script', "GLOSSARPLUGIN", $script, 'JQUERYPLUGIN');
+    Foswiki::Func::addToZone('script', "GLOSSARPLUGIN", $script, 'JQUERYPLUGIN::GLOSSAR');
     # Plugin correctly initialized
     return 1;
 }
