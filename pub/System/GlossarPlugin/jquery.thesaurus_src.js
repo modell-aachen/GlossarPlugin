@@ -27,7 +27,7 @@ var lang = GlossarLang,
         'div.thesaurus .thesaurus-alts ul { margin: 0; }' +
         'dfn.thesaurus { text-decoration: none; font-style: inherit; border-bottom: 1px dashed black; cursor: pointer; }' +
         '.hidden {display: none}',
-    TOOLTIP_LOADING_TPL = '<img src="'+foswiki.getPreference('PUBURLPATH')+'/System/JQueryPlugin/images/spinner.gif">',
+    TOOLTIP_LOADING_TPL = '<img src="%PUBURLPATH%/%SYSTEMWEB%/JQueryPlugin/images/spinner.gif">', // can't use foswiki object yet, we might be loaded before FOSWIKI::PREFERENCES
     TOOLTIP_DISAMBIG_TPL = '<div class="thesaurus-addendum"><div class="thesaurus-alts-title">'+lang.disambiguate+'</div><ul class="thesaurus-alts"></ul></div>',
     TOOLTIP_BODY_TPL = '<div class="thesaurus-header"><a class="term_editbtn foswikiButton">'+lang.btn_edit_label+'</a><a class="term"></a></div><div class="thesaurus-body"><div class="thesaurus-text"></div></div>';
 
@@ -152,6 +152,7 @@ Tooltip.prototype = {
         this.boxes.text = this.boundingBox.find('div.thesaurus-text');
         this.boxes.edit = this.boundingBox.find('a.term_editbtn').hide();
         this.boxes.title.html($(this.currentTarget).text());
+        TOOLTIP_LOADING_TPL = TOOLTIP_LOADING_TPL.replace('%PUBURLPATH%', foswiki.getPreference('PUBURLPATH')).replace('%SYSTEMWEB%', foswiki.getPreference('SYSTEMWEB'));
         this.boxes.text.html(TOOLTIP_LOADING_TPL);
         this.adjust();
         if ($.fn.bgiframe) {
