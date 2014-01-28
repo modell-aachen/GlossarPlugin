@@ -324,8 +324,10 @@ Thesaurus.instance = null;
 
 Thesaurus.prototype = {
     canonicalTerms : {},
-    terms : {},
-    topics : {},
+    terms : null, // hash of terms with associated topics
+    regs : null, // list of regular expressions that match terms
+                 // Each entry is an array itself: [RegEx, length of term]
+    topics : {}, // hash of topics with associated terms
     options : {}, // Configuration
     cache: {}, // Caches requestd term definitions
     timer : null, // Timer for popup delay
@@ -351,23 +353,36 @@ Thesaurus.prototype = {
      * @param HTMLNode tooltipNode
      * @param HTMLNode parentTooltipNode
      */
-    _processOverlayTooltip : function(tooltipNode, parentTooltipNode, terms) {
+    _processOverlayTooltip : function(tooltipNode, parentTooltipNode, regs) {
         if (tooltipNode) {
-            this._thesaurify($(tooltipNode).find('.thesaurus-text')[0], $(parentTooltipNode).attr('id'), terms);
+            if(regs) {
+                this._thesaurify(tooltipNode, $(parentTooltipNode).attr('id'), regs);
+            }
             this.bindUI(tooltipNode);
         }
     },
     /**
      * Set up tooltip contents once all data is loaded
      */
-    _populateTooltip : function(e, instance, data, term) {
-        var topics = $.extend({}, this.topics);
-        if (this.options.pMode == 'on')
-            ; // do nothing
-        else if (this.options.pMode == 'single')
-            delete topics[data.topic];
-        else
-            topics = {};
+    _populateTooltip : function(e, instance, data, topic) {
+        var tooltip_topics, tooltip_regs;
+        // depending on pMode we need a different set of terms/regs
+        if (this.options.pMode == 'on') {
+            // use all terms on tooltip
+            tooltip_topics = this.topics;
+            tooltip_regs = this.regs;
+        } else if (this.options.pMode == 'single') {
+            // use all terms except the on the tooltip is for
+            tooltip_topics = $.extend({}, this.topics);
+            delete tooltip_topics[topic];
+            var t_r = this._generateTermsIdx(tooltip_topics);
+            tooltip_topics = t_r[0];
+            tooltip_regs = t_r[1];
+        } else {
+            // do not therausify anything in the tooltip
+            tooltip_topics = {};
+            tooltip_regs = [];
+        }
 
         var o = this;
 
@@ -383,7 +398,7 @@ Thesaurus.prototype = {
         if (data.cssclass) {
             instance.addClass(data.cssclass);
         }
-        this._processOverlayTooltip(instance.boxes.text, e.currentTarget, this._generateTermsIdx(topics));
+        this._processOverlayTooltip(instance.boxes.text, e.currentTarget, tooltip_regs);
     },
     // Takes a list of terms in internal representation and creates a string
     // representation formatted for displaying
@@ -396,7 +411,7 @@ Thesaurus.prototype = {
         instance.setEditLink(null);
         var fromcache = this.cache[topic];
         if (undefined !== fromcache)
-            return this._populateTooltip(e, instance, fromcache, term);
+            return this._populateTooltip(e, instance, fromcache, topic);
 
         var o = this;
         $.getScript(this.options.controller + "?thetopic="+ topic, function() {
@@ -405,7 +420,7 @@ Thesaurus.prototype = {
                     fromcache = {text: '<b><span class="foswikiAlert">'+fromcache.error+'</b></span>', edit: 0};
                 }
                 o.cache[topic] = fromcache;
-                o._populateTooltip(e, instance, fromcache, term);
+                o._populateTooltip(e, instance, fromcache, topic);
         });
     },
     /**
@@ -499,6 +514,7 @@ Thesaurus.prototype = {
     },
     _generateTermsIdx : function(topics) {
         var term2topics = {};
+        var regs = [];
         $.each(topics, function(topic, terms) {
             $.each(terms, function(id2, term) {
                 if (term2topics[term] === undefined)
@@ -506,7 +522,16 @@ Thesaurus.prototype = {
                 term2topics[term].push(topic);
             });
         });
-        return term2topics;
+        var modifier = this.options.caseSensitive!="off"?"s":"si";
+        $.each(term2topics, function(term, topics) {
+            var re = XRegExp('^((?:.*?\\P{L})?)('+XRegExp.escape(term)+')((?:\\P{L}.*)?)$', modifier);
+            regs.push([re, term.length]);
+        });
+        var sorter = function(a,b) {
+            return a[1] - b[1];
+        };
+        regs.sort(sorter);
+        return [term2topics, regs];
     },
     /**
      * 1) Loads list of terms from server
@@ -530,9 +555,11 @@ Thesaurus.prototype = {
                           return lcval;
                       });
                   });
-                  this.terms = this._generateTermsIdx(this.topics);
+                  var t_r = this._generateTermsIdx(this.topics);
+                  this.terms = t_r[0];
+                  this.regs = t_r[1];
                   $.each(this.options.containers, function(i, node) {
-                    o._thesaurify(node, undefined, o.terms);
+                    o._thesaurify(node, undefined, t_r[1]);
                   });
                   this.bindUI('body');
                 }, this),
@@ -544,36 +571,38 @@ Thesaurus.prototype = {
      * @param HTMLNode node
      */
     _thesaurifyNode : function(node, relId, regs) {
-        var html = $('<span></span>').append($(node).clone()).html();
-        $.each(regs, function(inx, re) {
-            if (relId)
-                html = html.replace(re, '$1<dfn rel="'+ relId +'" class="thesaurus">$2</dfn>$3');
-            else
-                html = html.replace(re, '$1<dfn class="thesaurus">$2</dfn>$3');
-        });
-        $(node).replaceWith(html);
+        var newNode = this._thesaurifyNodeRecursive(node.nodeValue, relId, regs, regs.length-1);
+        if(newNode) $(node).replaceWith(newNode);
+    },
+    _thesaurifyNodeRecursive : function(node, relId, regs, i) {
+        if(node.length == 0) return false;
+        var html = node;
+        while(i >= 0) {
+            var match = regs[i][0].exec(html);
+            if(match) {
+                if(relId) {
+                    html = '<dfn rel="'+ relId +'" class="thesaurus">' + match[2] + '</dfn>';
+                } else {
+                    html = '<dfn class="thesaurus">' + match[2] + '</dfn>';
+                }
+                var leftNode = this._thesaurifyNodeRecursive(match[1], relId, regs, i) || match[1];
+                var rightNode = this._thesaurifyNodeRecursive(match[3], relId, regs, i) || match[3];
+                return  leftNode + html + rightNode;
+            }
+            i--;
+        }
+        return false;
     },
     /**
      * Traverses configured nodes for all their children textNodes
      * @param HTMLNode node
      */
-    _thesaurify : function(node, relId, terms) {
-        var regs = [];
-        var modifier = this.options.caseSensitive!="off"?"g":"gi";
-        $.each(terms, function(term, syno) {
-            // \b does not work with non-ASCII letters, so use XRegExp lib w/ Unicode addon
-            // \P{L} = extension to match everything except Unicode letters
-            var re = XRegExp('(^|\\P{L})('+XRegExp.escape(term)+')(\\P{L}|$)', modifier);
-            regs.push(re);
-        });
-        this._thesaurifyRecursive(node, relId, regs);
-    },
-    _thesaurifyRecursive : function(node, relId, regs) {
+    _thesaurify : function(node, relId, regs) {
         var nodes = [];
         $.each($(node).get(), $.proxy(function(inx, el){
             $.each(el.childNodes, $.proxy(function(i, child){
                 if (child.childNodes.length && undefined === UNAPPROPRIATE_TAGS[child.tagName]) {
-                    this._thesaurifyRecursive(child, relId, regs);
+                    this._thesaurify(child, relId, regs);
                 }
                 // Is it a non-empty text node?
                 if (undefined === child.tagName && child.nodeValue.length) {
