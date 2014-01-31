@@ -355,10 +355,14 @@ Thesaurus.prototype = {
      */
     _processOverlayTooltip : function(tooltipNode, parentTooltipNode, regs) {
         if (tooltipNode) {
-            if(regs) {
-                this._thesaurify(tooltipNode, $(parentTooltipNode).attr('id'), regs);
+            if (regs) {
+                var o = this;
+                this._thesaurify(tooltipNode, $(parentTooltipNode).attr('id'), regs, function() {
+                    o.bindUI(tooltipNode);
+                });
+            } else {
+                this.bindUI(tooltipNode);
             }
-            this.bindUI(tooltipNode);
         }
     },
     /**
@@ -559,9 +563,10 @@ Thesaurus.prototype = {
                   this.terms = t_r[0];
                   this.regs = t_r[1];
                   $.each(this.options.containers, function(i, node) {
-                    o._thesaurify(node, undefined, t_r[1]);
+                      o._thesaurify(node, undefined, t_r[1], function() {
+                          o.bindUI('body');
+                      });
                   });
-                  this.bindUI('body');
                 }, this),
                 cache: true
         });
@@ -610,7 +615,7 @@ Thesaurus.prototype = {
      * Traverses configured nodes for all their children textNodes
      * @param HTMLNode node
      */
-    _thesaurify : function(node, relId, regs) {
+    _thesaurify : function(node, relId, regs, doneFunc) {
         var nodes = [];
         this._thesaurifyCollectNodes(node, nodes);
         var len = nodes.length;
@@ -622,6 +627,7 @@ Thesaurus.prototype = {
                 this._thesaurifyNode(el, relId, regs);
             }
             if (idx < len) window.setTimeout(doBatch);
+            else if (doneFunc) doneFunc();
         }, this);
         doBatch();
     }
