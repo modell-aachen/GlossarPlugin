@@ -593,27 +593,37 @@ Thesaurus.prototype = {
         }
         return false;
     },
+    _thesaurifyCollectNodes : function(node, result) {
+        $.each($(node).get(), $.proxy(function(inx, el){
+            $.each(el.childNodes, $.proxy(function(i, child){
+                if (child.nodeType == 1 && child.childNodes.length && undefined === UNAPPROPRIATE_TAGS[child.tagName]) {
+                    this._thesaurifyCollectNodes(child, result);
+                }
+                // Is it a non-empty text node?
+                else if (child.nodeType == 3 && child.nodeValue.length) {
+                    result.push(child);
+                }
+            }, this));
+        }, this));
+    },
     /**
      * Traverses configured nodes for all their children textNodes
      * @param HTMLNode node
      */
     _thesaurify : function(node, relId, regs) {
         var nodes = [];
-        $.each($(node).get(), $.proxy(function(inx, el){
-            $.each(el.childNodes, $.proxy(function(i, child){
-                if (child.childNodes.length && undefined === UNAPPROPRIATE_TAGS[child.tagName]) {
-                    this._thesaurify(child, relId, regs);
-                }
-                // Is it a non-empty text node?
-                if (undefined === child.tagName && child.nodeValue.length) {
-                    nodes.push(child);
-                }
-            }, this));
-        }, this));
-
-        $.each(nodes, $.proxy(function(idx, el) {
-            this._thesaurifyNode(el, relId, regs);
-        }, this));
+        this._thesaurifyCollectNodes(node, nodes);
+        var len = nodes.length;
+        var idx = 0;
+        var doBatch; doBatch = $.proxy(function() {
+            var i = 20;
+            while (i-- && idx < len) {
+                var el = nodes[idx++];
+                this._thesaurifyNode(el, relId, regs);
+            }
+            if (idx < len) window.setTimeout(doBatch);
+        }, this);
+        doBatch();
     }
 };
 
