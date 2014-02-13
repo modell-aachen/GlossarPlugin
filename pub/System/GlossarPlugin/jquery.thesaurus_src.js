@@ -357,9 +357,7 @@ Thesaurus.prototype = {
         if (tooltipNode) {
             if (regs) {
                 var o = this;
-                this._thesaurify(tooltipNode, $(parentTooltipNode).attr('id'), regs, function() {
-                    o.bindUI(tooltipNode);
-                });
+                this._thesaurify(tooltipNode, $(parentTooltipNode).attr('id'), regs);
             } else {
                 this.bindUI(tooltipNode);
             }
@@ -369,40 +367,36 @@ Thesaurus.prototype = {
      * Set up tooltip contents once all data is loaded
      */
     _populateTooltip : function(e, instance, data, topic) {
-        var tooltip_topics, tooltip_regs;
+        var def;
         // depending on pMode we need a different set of terms/regs
         if (this.options.pMode == 'on') {
             // use all terms on tooltip
-            tooltip_topics = this.topics;
-            tooltip_regs = this.regs;
+            def = $.Deferred(); def.resolve(this.topics, this.regs);
         } else if (this.options.pMode == 'single') {
             // use all terms except the on the tooltip is for
             tooltip_topics = $.extend({}, this.topics);
             delete tooltip_topics[topic];
-            var t_r = this._generateTermsIdx(tooltip_topics);
-            tooltip_topics = t_r[0];
-            tooltip_regs = t_r[1];
+            def = this._generateTermsIdx(tooltip_topics);
         } else {
-            // do not therausify anything in the tooltip
-            tooltip_topics = {};
-            tooltip_regs = [];
+            // do not thesaurify anything in the tooltip
+            def = $.Deferred(); def.resolve({}, []);
         }
-
         var o = this;
-
-        // Cobble together all the things to fill into the tooltip
-        var linkbase = foswiki.getPreference('SCRIPTURLPATH')+'/view'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+this.options.web;
-        Tooltip.setContent(e, {text: data.text});
-        instance.setLink(linkbase +'/'+ data.topic);
-        if (data.edit) {
-            instance.setEditLink(foswiki.getPreference('SCRIPTURLPATH')+'/edit'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+this.options.web+'/'+data.topic);
-        } else {
-            instance.setEditLink(null);
-        }
-        if (data.cssclass) {
-            instance.addClass(data.cssclass);
-        }
-        this._processOverlayTooltip(instance.boxes.text, e.currentTarget, tooltip_regs);
+        def.done(function(tooltip_topics, tooltip_regs) {
+            // Cobble together all the things to fill into the tooltip
+            var linkbase = foswiki.getPreference('SCRIPTURLPATH')+'/view'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+o.options.web;
+            Tooltip.setContent(e, {text: data.text});
+            instance.setLink(linkbase +'/'+ data.topic);
+            if (data.edit) {
+                instance.setEditLink(foswiki.getPreference('SCRIPTURLPATH')+'/edit'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+o.options.web+'/'+data.topic);
+            } else {
+                instance.setEditLink(null);
+            }
+            if (data.cssclass) {
+                instance.addClass(data.cssclass);
+            }
+            o._processOverlayTooltip(instance.boxes.text, e.currentTarget, tooltip_regs);
+        });
     },
     // Takes a list of terms in internal representation and creates a string
     // representation formatted for displaying
@@ -518,24 +512,40 @@ Thesaurus.prototype = {
     },
     _generateTermsIdx : function(topics) {
         var term2topics = {};
+        var terms = [];
         var regs = [];
-        $.each(topics, function(topic, terms) {
-            $.each(terms, function(id2, term) {
-                if (term2topics[term] === undefined)
+        $.each(topics, function(topic, cterms) {
+            $.each(cterms, function(id2, term) {
+                if (term2topics[term] === undefined) {
                     term2topics[term] = [];
+                    terms.push(term);
+                }
                 term2topics[term].push(topic);
             });
         });
-        var modifier = this.options.caseSensitive!="off"?"s":"si";
-        $.each(term2topics, function(term, topics) {
-            var re = XRegExp('^((?:.*?\\P{L})?)('+XRegExp.escape(term)+')((?:\\P{L}.*)?)$', modifier);
-            regs.push([re, term.length]);
-        });
-        var sorter = function(a,b) {
-            return a[1] - b[1];
-        };
-        regs.sort(sorter);
-        return [term2topics, regs];
+        var def = $.Deferred();
+        var term_len = terms.length;
+        var idx = 0;
+        var doBatch = $.proxy(function() {
+            var i = 200;
+            while (i-- && idx < term_len) {
+                var escterm = XRegExp.escape(terms[idx]);
+                var re = RegExp(escterm, this.re_modifier);
+                regs.push([re, terms[idx].length, escterm]);
+                idx++;
+            }
+            if (idx < term_len) {
+                setTimeout(doBatch, 10);
+                return;
+            }
+            var sorter = function(a,b) {
+                return a[1] - b[1];
+            };
+            regs.sort(sorter);
+            def.resolve(term2topics, regs);
+        }, this);
+        doBatch();
+        return def;
     },
     /**
      * 1) Loads list of terms from server
@@ -545,6 +555,8 @@ Thesaurus.prototype = {
      */
     bootstrap : function() {
         var o = this;
+        o.re_modifier = this.options.caseSensitive!="off"?"":"i";
+        o.re_template = XRegExp('^((?:.*?\\P{L})?)(BWARGH)((?:\\P{L}.*)?)$', 's'+o.re_modifier).toString().replace(/(^\/|\/[a-z]*$)/g, '').split('BWARGH');
         $.ajax({
                 url:this.options.controller+ "?" + this.options.id + "&" + encodeURI(foswiki.getPreference('USERNAME')),
                 dataType: "script",
@@ -559,14 +571,13 @@ Thesaurus.prototype = {
                           return lcval;
                       });
                   });
-                  var t_r = this._generateTermsIdx(this.topics);
-                  this.terms = t_r[0];
-                  this.regs = t_r[1];
-                  $.each(this.options.containers, function(i, node) {
-                      o._thesaurify(node, undefined, t_r[1], function() {
-                          o.bindUI('body');
+                  this._generateTermsIdx(this.topics).done($.proxy(function(t2t, regs) {
+                      this.terms = t2t;
+                      this.regs = regs;
+                      $.each(this.options.containers, function(i, node) {
+                          o._thesaurify(node, undefined, regs);
                       });
-                  });
+                  }, this));
                 }, this),
                 cache: true
         });
@@ -577,13 +588,24 @@ Thesaurus.prototype = {
      */
     _thesaurifyNode : function(node, relId, regs) {
         var newNode = this._thesaurifyNodeRecursive(node.nodeValue, relId, regs, regs.length-1);
-        if(newNode) $(node).replaceWith(newNode);
+        if (!newNode) return;
+        var theParent = node.parentNode;
+        $(node).replaceWith(newNode);
+        $(theParent).find('dfn.thesaurus').
+                bind('mouseenter', $.proxy(this._onMouseOver, this)).
+                bind('mouseleave', $.proxy(this._onMouseOut, this));
     },
     _thesaurifyNodeRecursive : function(node, relId, regs, i) {
         if(node.length == 0) return false;
         var html = node;
-        while(i >= 0) {
-            var match = regs[i][0].exec(html);
+        i++; // Hack to have the right starting value inside the loop;
+        while(i-- > 0) {
+            // Try quick test first
+            if (!regs[i][0].exec(html)) continue;
+            if (!(regs[i][2] instanceof RegExp)) {
+                regs[i][2] = RegExp(this.re_template[0] + regs[i][2] + this.re_template[1], this.re_modifier);
+            }
+            var match = regs[i][2].exec(html);
             if(match) {
                 if(relId) {
                     html = '<dfn rel="'+ relId +'" class="thesaurus">' + match[2] + '</dfn>';
@@ -594,7 +616,6 @@ Thesaurus.prototype = {
                 var rightNode = this._thesaurifyNodeRecursive(match[3], relId, regs, i) || match[3];
                 return  leftNode + html + rightNode;
             }
-            i--;
         }
         return false;
     },
@@ -615,21 +636,23 @@ Thesaurus.prototype = {
      * Traverses configured nodes for all their children textNodes
      * @param HTMLNode node
      */
-    _thesaurify : function(node, relId, regs, doneFunc) {
+    _thesaurify : function(node, relId, regs) {
         var nodes = [];
         this._thesaurifyCollectNodes(node, nodes);
         var len = nodes.length;
         var idx = 0;
+        var def = $.Deferred();
         var doBatch; doBatch = $.proxy(function() {
             var i = 20;
             while (i-- && idx < len) {
                 var el = nodes[idx++];
                 this._thesaurifyNode(el, relId, regs);
             }
-            if (idx < len) window.setTimeout(doBatch);
-            else if (doneFunc) doneFunc();
+            if (idx < len) setTimeout(doBatch, 10);
+            else def.resolve();
         }, this);
         doBatch();
+        return def;
     }
 };
 
