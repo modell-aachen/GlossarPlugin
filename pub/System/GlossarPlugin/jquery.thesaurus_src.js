@@ -591,7 +591,7 @@ Thesaurus.prototype = {
         if (!newNode) return;
         var theParent = node.parentNode;
         $(node).replaceWith(newNode);
-        $(theParent).find('dfn.thesaurus').
+        $(theParent).find('dfn.thesaurus:not(.glossarybound)').addClass('glossarybound').
                 bind('mouseenter', $.proxy(this._onMouseOver, this)).
                 bind('mouseleave', $.proxy(this._onMouseOut, this));
     },
