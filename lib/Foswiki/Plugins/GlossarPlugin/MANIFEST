@@ -15,3 +15,5 @@ pub/System/GlossarPlugin/xregexp.js 0644 extended regexp library
 pub/System/GlossarPlugin/unicode-base.js 0644 unicode letter class for xregexp
 locale/GlossarPlugin/de.po 0644 german translations
 locale/GlossarPlugin/fr.po 0644
+locale/GlossarPlugin/it.po 0644
+locale/GlossarPlugin/zh-cn.po 0644
