@@ -15,18 +15,18 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/Sandbox/GlossarIndex.txt:29 data/Sandbox/GlossarIndex.txt:31 data/Sandbox/GlossarIndex.txt:33 data/Sandbox/GlossarIndex.txt:47
+#: data/Sandbox/GlossarIndex.txt data/Sandbox/GlossarIndex.txt data/Sandbox/GlossarIndex.txt data/Sandbox/GlossarIndex.txt
 msgid "Create new glossary entry"
 msgstr ""
 
-#: data/Sandbox/GlossarIndex.txt:45
+#: data/Sandbox/GlossarIndex.txt
 msgid "Description:"
 msgstr ""
 
-#: data/Sandbox/GlossarIndex.txt:4
+#: data/Sandbox/GlossarIndex.txt
 msgid "Glossary entries"
 msgstr ""
 
-#: data/Sandbox/GlossarIndex.txt:43
+#: data/Sandbox/GlossarIndex.txt
 msgid "Glossary term:"
 msgstr ""
