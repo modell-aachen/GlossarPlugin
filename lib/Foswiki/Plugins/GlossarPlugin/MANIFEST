@@ -1,19 +1,20 @@
 # Release manifest for GlossarPlugin
-data/System/GlossarPlugin.txt 0644 Documentation
-data/System/GlossaryPopupTemplate.txt 0644 View template for popups
-data/Sandbox/GlossarForm.txt 0644 Form
-data/Sandbox/GlossarTemplate.txt 0644 Form
-data/Sandbox/GlossarIndex.txt 0644 Example for index of all terms.
-lib/Foswiki/Plugins/GlossarPlugin.pm 0644 Perl module
-lib/Foswiki/Plugins/GlossarPlugin/Controller.pm 0644 Controller for the JavaScript
-lib/Foswiki/Plugins/GlossarPlugin/Config.spec 0644 Configuration
-lib/Foswiki/Plugins/GlossarPlugin/JQuery.pm 0644 JQuery plugin
+data/System/GlossarPlugin.txt 0664 Documentation
+data/System/GlossaryPopupTemplate.txt 0664 View template for popups
+data/Sandbox/GlossarForm.txt 0664 Form
+data/Sandbox/GlossarTemplate.txt 0664 Form
+data/Sandbox/GlossarIndex.txt 0664 Example for index of all terms.
+lib/Foswiki/Plugins/GlossarPlugin.pm 0444 Perl module
+lib/Foswiki/Plugins/GlossarPlugin/Controller.pm 0444 Controller for the JavaScript
+lib/Foswiki/Plugins/GlossarPlugin/Config.spec 0444 Configuration
+lib/Foswiki/Plugins/GlossarPlugin/JQuery.pm 0444 JQuery plugin
 pub/System/GlossarPlugin/jquery.thesaurus.js 0644 actual thesaurus script
 pub/System/GlossarPlugin/jquery.thesaurus_de.js 0644 German translation
 pub/System/GlossarPlugin/jquery.thesaurus_en.js 0644 English translation
 pub/System/GlossarPlugin/xregexp.js 0644 extended regexp library
 pub/System/GlossarPlugin/unicode-base.js 0644 unicode letter class for xregexp
-locale/GlossarPlugin/de.po 0644 german translations
-locale/GlossarPlugin/fr.po 0644
-locale/GlossarPlugin/it.po 0644
-locale/GlossarPlugin/zh-cn.po 0644
+locale/GlossarPlugin/cs.po 0664
+locale/GlossarPlugin/de.po 0664 german translations
+locale/GlossarPlugin/fr.po 0664
+locale/GlossarPlugin/it.po 0664
+locale/GlossarPlugin/zh-cn.po 0664

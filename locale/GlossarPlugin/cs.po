@@ -1,0 +1,15 @@
+#: data/Sandbox/GlossarIndex.txt
+msgid "Create new glossary entry"
+msgstr ""
+
+#: data/Sandbox/GlossarIndex.txt
+msgid "Description:"
+msgstr ""
+
+#: data/Sandbox/GlossarIndex.txt
+msgid "Glossary entries"
+msgstr ""
+
+#: data/Sandbox/GlossarIndex.txt
+msgid "Glossary term:"
+msgstr ""
