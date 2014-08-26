@@ -41,7 +41,7 @@ type="query"
 "form.name ~ '*Glossar*Form' AND Enabled = 'Enabled'$addQuery"
 web="$glossar"
 nonoise="on"
-format="\$topic\t\$formfield(keywords)"
+format="$glossar.\$topic\t\$formfield(keywords)"
 separator="\$n"
 footer=""
 header=""
@@ -62,7 +62,9 @@ SEARCH
 }
 
 sub _getTopic {
-    my ($user, $glossar, $topic) = @_;
+    my ($user, $webtopic) = @_;
+
+    my ($glossar, $topic) = Foswiki::Func::normalizeWebTopicName(undef, $webtopic);
 
     my $re;
     unless (
@@ -113,7 +115,7 @@ sub _getTopic {
     $cssclass = ( $cssclass ) ? $cssclass->{value} : '';
 
     return {
-        topic => $topic,
+        topic => "$glossar.$topic",
         text => $re,
         edit => $canChange,
         cssclass => $cssclass
@@ -126,7 +128,8 @@ sub response {
     my $topic = $query->{param}->{thetopic}[0];  # topic to display in a popup
     my $user = $Foswiki::Plugins::SESSION->{user};  # user for AccessPermission
     $user = Foswiki::Func::getWikiName($user);
-    my $glossar = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb}
+    my $glossar = $query->param('web')
+      || $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb}
       || 'Glossar';  # The web with the definitions
     my $addQuery =
       $Foswiki::cfg{Extensions}{GlossarPlugin}
@@ -140,7 +143,7 @@ sub response {
     if (not defined $topic) {
         @re = _getList($user, $glossar, $addQuery);
     } else {
-        @re = _getTopic($user, $glossar, $topic);
+        @re = _getTopic($user, $topic);
     }
     my $status = defined($re[0]) ? 'ok' : $re[1];
     my $payload = defined($re[0]) ? $re[0] : [];

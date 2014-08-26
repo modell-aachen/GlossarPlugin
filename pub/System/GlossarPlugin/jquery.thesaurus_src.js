@@ -384,11 +384,12 @@ Thesaurus.prototype = {
         var o = this;
         def.done(function(tooltip_topics, tooltip_regs) {
             // Cobble together all the things to fill into the tooltip
-            var linkbase = foswiki.getPreference('SCRIPTURLPATH')+'/view'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+o.options.web;
+            var linkbase = foswiki.getPreference('SCRIPTURLPATH')+'/view'+foswiki.getPreference('SCRIPTSUFFIX')+'/';
+            var webtopic = data.topic.replace(/\./g, '/');
             Tooltip.setContent(e, {text: data.text});
-            instance.setLink(linkbase +'/'+ data.topic);
+            instance.setLink(linkbase + webtopic);
             if (data.edit) {
-                instance.setEditLink(foswiki.getPreference('SCRIPTURLPATH')+'/edit'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+o.options.web+'/'+data.topic);
+                instance.setEditLink(foswiki.getPreference('SCRIPTURLPATH')+'/edit'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+webtopic);
             } else {
                 instance.setEditLink(null);
             }
@@ -557,29 +558,39 @@ Thesaurus.prototype = {
         var o = this;
         o.re_modifier = this.options.caseSensitive!="off"?"":"i";
         o.re_template = XRegExp('^((?:.*?\\P{L})?)(BWARGH)((?:\\P{L}.*)?)$', 's'+o.re_modifier).toString().replace(/(^\/|\/[a-z]*$)/g, '').split('BWARGH');
-        $.ajax({
-                url:this.options.controller+ "?" + this.options.id + "&" + encodeURI(foswiki.getPreference('USERNAME')),
-                dataType: "script",
-                success: $.proxy(function(){
-                  this.topics = this._processResponse($.callbackData);
-                  if (this.topics.error) return;
-                  // Downcase the terms for case-insensitive lookups
-                  if (this.options.caseSensitive == 'off') $.each(this.topics, function(idx, termset) {
-                      o.topics[idx] = $.map(termset, function(val) {
-                          var lcval = val.toLowerCase();
-                          o.canonicalTerms[lcval] = val;
-                          return lcval;
+        var thesaurus = this;
+        var count = 0; // number of glossar webs
+        $.each(thesaurus.options.ids, function(web, id) {
+            count++;
+        });
+        $.each(thesaurus.options.ids, function(web, id) {
+            $.ajax({
+                    url:thesaurus.options.controller+ "?id=" + id + "&web=" + web + "&" + encodeURI(foswiki.getPreference('USERNAME')),
+                    dataType: "script",
+                    success: function(){
+                      var newtopics = thesaurus._processResponse($.callbackData);
+                      if (!newtopics.error) {
+                          thesaurus.topics = jQuery.extend(thesaurus.topics, newtopics);
+                      }
+                      if(--count) return; // only process terms when all webs are loaded
+                      // Downcase the terms for case-insensitive lookups
+                      if (thesaurus.options.caseSensitive == 'off') $.each(thesaurus.topics, function(idx, termset) {
+                          o.topics[idx] = $.map(termset, function(val) {
+                              var lcval = val.toLowerCase();
+                              o.canonicalTerms[lcval] = val;
+                              return lcval;
+                          });
                       });
-                  });
-                  this._generateTermsIdx(this.topics).done($.proxy(function(t2t, regs) {
-                      this.terms = t2t;
-                      this.regs = regs;
-                      $.each(this.options.containers, function(i, node) {
-                          o._thesaurify(node, undefined, regs);
+                      thesaurus._generateTermsIdx(thesaurus.topics).done(function(t2t, regs) {
+                          thesaurus.terms = t2t;
+                          thesaurus.regs = regs;
+                          $.each(thesaurus.options.containers, function(i, node) {
+                              o._thesaurify(node, undefined, regs);
+                          });
                       });
-                  }, this));
-                }, this),
-                cache: true
+                    },
+                    cache: true
+            });
         });
     },
     /**
@@ -665,7 +676,7 @@ Thesaurus.options = {
     containers: [], // Put here list of selectors for the DOM element you want to analyze for terms
     effect: null, // Can be also fade or slide
     controller: 'controller.csv.php', // Path to the controller
-    web: 'Glossar', // Web we're playing in
+    ids: {'Glossar':null}, // Web/id we're playing in
     popindelay: 1000,
     preload: 400,
     pMode: 'on',

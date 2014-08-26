@@ -35,6 +35,9 @@ our $SHORTDESCRIPTION = 'Creates a pop-up glossar for your wiki.';
 
 our $NO_PREFS_IN_TOPIC = 1;
 
+# Regex to check if a web is a glossary web (as set in configure)
+our $gwebRegex;
+
 =begin TML
 
 ---++ initPlugin($topic, $web, $user) -> $boolean
@@ -56,6 +59,7 @@ sub initPlugin {
         return 0;
     }
 
+    _generateGwebRegex() unless $gwebRegex;
 
     # controller to be called from the JavaScript
     Foswiki::Func::registerRESTHandler('controller', \&restController);
@@ -69,15 +73,28 @@ sub initPlugin {
     return 1 if $exceptions && $topic =~ /$exceptions/;
     my $status = Foswiki::Func::getPreferencesValue('GLOSSARY');
     $status ||= Foswiki::Func::getPreferencesValue('GLOSSAR');
-    return 1 unless $status && $status eq '1';
+    return 1 unless $status;
 
     my $iTopic     = 'GlossarIdentifier';
-    my $glossarWeb = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb};
-    my ($iMeta, $iText) = Foswiki::Func::readTopic($glossarWeb, $iTopic);
-    my $ident = $iMeta->get('GLOSSARY');
-    $ident ||= $iMeta->get('GLOSSAR');
-    $ident = $ident->{index} if $ident;
-    $ident = 'null' unless defined $ident;
+    my $glossarWebs;
+    if ($status =~ m#\s*1\s*#) {
+        $glossarWebs = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb};
+        $glossarWebs =~ s#^\s*##;
+    } else {
+        $glossarWebs = $status;
+    }
+    $glossarWebs =~ s#\s*$##;
+    my $ids = '';
+    foreach my $glossarWeb (split(/\s*,\s*/, $glossarWebs)) {
+        next unless $glossarWeb =~ m/$gwebRegex/;
+        my ($iMeta, $iText) = Foswiki::Func::readTopic($glossarWeb, $iTopic);
+        my $id = $iMeta->get('GLOSSARY');
+        $id ||= $iMeta->get('GLOSSAR'); # for backwards compatibility
+        $id = $id->{index} if $id;
+        $id = 'null' unless defined $id;
+        $ids .= ',' if $ids;
+        $ids .= "'$glossarWeb':'$id'"; # This should be valid json unless strange names are allowed for webs.
+    }
 
     # Add Script to header
     my $restPath = Foswiki::Func::getScriptUrl('', '', 'rest');
@@ -100,10 +117,9 @@ sub initPlugin {
 jQuery(function(\$) { \$.Thesaurus({
     caseSensitive: '$caseSensitive',
     containers: ['$containers'],
-    web: '$glossarWeb',
     effect: $effect,
     controller: '$restPath/GlossarPlugin/controller',
-    id: $ident,
+    ids: {$ids},
     css: '$css',
     popindelay: $popindelay,
     preload: $preload,
@@ -162,7 +178,7 @@ sub beforeSaveHandler {
     # variable $_[0]. These allow you to operate on $text
     # as if it was passed by reference; for example:
     # $_[0] =~ s/SpecialString/my alternative/ge;
-    return if $web ne $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb};
+    return if $web !~ m/$gwebRegex/;
 
     my $indexChanged = 0;
     my $iTopic       = 'GlossarIdentifier';
@@ -204,12 +220,12 @@ sub beforeSaveHandler {
     }
 
     if ($indexChanged) {
-        _generateNewId();
+        _generateNewId($web);
     }
 }
 
 sub _generateNewId {
-    my $web           = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb};
+    my ($web) = @_;
     my $iTopic        = 'GlossarIdentifier';
     my $newIdentifier = int(rand(1000000));
 
@@ -241,18 +257,26 @@ sub afterRenameHandler {
     my ( $oldWeb, $oldTopic, $oldAttachment,
          $newWeb, $newTopic, $newAttachment ) = @_;
 
-    my $gweb = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb} || '';
-    return if($oldWeb ne $gweb && $newWeb ne $gweb);
-
     # XXX It seems there is no beforeRenameHandler so I see no way to check, if tags have changed.
     # So I'm going to generate a new ID unconditionally
-    _generateNewId();
+    _generateNewId($newWeb) if $newWeb =~ m/$gwebRegex/;
+    _generateNewId($oldWeb) if $oldWeb ne $newWeb && $oldWeb =~ m/$gwebRegex/;
 }
 
 sub _GLOSSARSEARCHOPTS {
     my $addQuery = $Foswiki::cfg{Extensions}{GlossarPlugin}{AdditionalQuery};
     $addQuery = " AND $addQuery" if $addQuery;
     return $addQuery;
+}
+
+# generates the $gwebRegex which determines if a web is set as a glossary web
+# in configure
+sub _generateGwebRegex {
+    my $webs = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb};
+    $webs =~ s#^\s*##;
+    $webs =~ s#\s*$##;
+    $webs =~ s#\s*,\s*#|#g;
+    $gwebRegex = qr($webs); # assuming there are no strange characters allowed in web names
 }
 
 1;
