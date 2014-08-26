@@ -67,13 +67,15 @@ sub initPlugin {
     # only add scripts if "turned on"
     my $exceptions = $Foswiki::cfg{Extensions}{GlossarPlugin}{SkipTopic};
     return 1 if $exceptions && $topic =~ /$exceptions/;
-    my $status = Foswiki::Func::getPreferencesValue('GLOSSAR');
+    my $status = Foswiki::Func::getPreferencesValue('GLOSSARY');
+    $status ||= Foswiki::Func::getPreferencesValue('GLOSSAR');
     return 1 unless $status && $status eq '1';
 
     my $iTopic     = 'GlossarIdentifier';
     my $glossarWeb = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb};
     my ($iMeta, $iText) = Foswiki::Func::readTopic($glossarWeb, $iTopic);
-    my $ident = $iMeta->get('GLOSSAR');
+    my $ident = $iMeta->get('GLOSSARY');
+    $ident ||= $iMeta->get('GLOSSAR');
     $ident = $ident->{index} if $ident;
     $ident = 'null' unless defined $ident;
 
@@ -212,7 +214,7 @@ sub _generateNewId {
     my $newIdentifier = int(rand(1000000));
 
     my ($iMeta, $iText) = Foswiki::Func::readTopic($web, $iTopic);
-    $iMeta->put('GLOSSAR', {index => $newIdentifier});
+    $iMeta->put('GLOSSARY', {index => $newIdentifier});
     Foswiki::Func::saveTopic($web, $iTopic, $iMeta, $iText,
         {ignorepermissions => 1});
 }
