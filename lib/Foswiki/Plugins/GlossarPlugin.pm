@@ -60,8 +60,6 @@ sub initPlugin {
     # controller to be called from the JavaScript
     Foswiki::Func::registerRESTHandler('controller', \&restController);
 
-    Foswiki::Func::registerRESTHandler('redirect', \&restRedirect);
-
     # Tag handler for searches
     Foswiki::Func::registerTagHandler('GLOSSARSEARCHOPTS',
         \&_GLOSSARSEARCHOPTS);
@@ -132,38 +130,6 @@ sub restController {
     require Foswiki::Plugins::GlossarPlugin::Controller;
     return Foswiki::Plugins::GlossarPlugin::Controller::response($session,
         $subject, $verb, $response);
-}
-
-sub restRedirect {
-    my ($session, $subject, $verb, $response) = @_;
-    my $query      = $session->{request};
-    my $term       = $query->{param}->{term}[0];
-    my $glossarWeb = $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb};
-    return "Kein Term!" unless $term;  # XXX
-
-    # XXX copy/paste
-    my $addQuery =
-      $Foswiki::cfg{Extensions}{GlossarPlugin}
-      {AdditionalQuery};               # Additional Query
-    $addQuery = " AND $addQuery" if $addQuery;
-    my $definition =
-      Foswiki::Func::expandCommonVariables(<<SEARCH, 'GlossarIndex', 'Glossar');
-%SEARCH{
-    type="query"
-    "form.name = 'GlossarForm' AND Enabled = 'Enabled' AND keywords =~ '$term'$addQuery"
-    web="Glossar"
-    nonoise="on"
-    format="\$topic"
-    header=""
-    footer=""
-    limit="1"
-}%
-SEARCH
-    return "Keine Definition zu $term gefunden!" unless $definition;  # XXX
-    Foswiki::Func::writeWarning("definition: $definition");
-    my $url = Foswiki::Func::getViewUrl($glossarWeb, $definition);
-    Foswiki::Func::redirectCgiQuery(undef, $url);
-    return "Sie werden zum Begriff weiter geleitet...";               # XXX
 }
 
 =begin TML
