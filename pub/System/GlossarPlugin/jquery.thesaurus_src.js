@@ -499,7 +499,7 @@ Thesaurus.prototype = {
             errorMsg = data.errorMsg;
         }
         if (null !== errorMsg) {
-            if(console && console.log) console.log(errorMsg);
+            window.console && console.log(errorMsg);
             return {error: errorMsg};
         }
         return data.payload;
