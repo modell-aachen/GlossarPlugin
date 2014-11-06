@@ -432,7 +432,10 @@ Thesaurus.prototype = {
             var term = this._internalTerm($(e.currentTarget).text());
             var topics = this.terms[term];
             var forceTopic = $(e.currentTarget).parent().attr('data-glossar');
-            if (forceTopic) topics = [forceTopic];
+            if (forceTopic) {
+                if(!/[./]/.exec(forceTopic)) forceTopic = foswiki.getPreference('WEB') + '.' + forceTopic;
+                topics = [forceTopic];
+            }
             var o = this;
             if (topics.length == 1)
                 return this._fetchTooltip(e, instance, term, topics[0]);
