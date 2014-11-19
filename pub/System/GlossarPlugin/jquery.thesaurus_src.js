@@ -577,13 +577,16 @@ Thesaurus.prototype = {
                       }
                       if(--count) return; // only process terms when all webs are loaded
                       // Downcase the terms for case-insensitive lookups
-                      if (thesaurus.options.caseSensitive == 'off') $.each(thesaurus.topics, function(idx, termset) {
-                          o.topics[idx] = $.map(termset, function(val) {
+                      if (thesaurus.options.caseSensitive == 'off') {
+                          var mapper = function(val) {
                               var lcval = val.toLowerCase();
                               o.canonicalTerms[lcval] = val;
                               return lcval;
+                          };
+                          $.each(thesaurus.topics, function(idx, termset) {
+                              o.topics[idx] = $.map(termset, mapper);
                           });
-                      });
+                      }
                       thesaurus._generateTermsIdx(thesaurus.topics).done(function(t2t, regs) {
                           thesaurus.terms = t2t;
                           thesaurus.regs = regs;
