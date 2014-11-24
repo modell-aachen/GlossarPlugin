@@ -28,6 +28,7 @@ If no term is given in the request it will return a list of known definitions, o
 
 sub _getList {
     my ($user, $glossar, $addQuery) = @_;
+    $glossar =~ s#/#.#g;
 
     return (undef, '403', ($Foswiki::cfg{Extensions}{GlossarPlugin}{AccessAreaPermission}
       || 'Error: Unfortunately you do not have sufficient permissions to view glossary entries!'))
