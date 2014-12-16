@@ -612,8 +612,8 @@ Thesaurus.prototype = {
                 } else {
                     html = '<dfn class="thesaurus">' + match[2] + '</dfn>';
                 }
-                var leftNode = this._thesaurifyNodeRecursive(match[1], relId, regs, i) || match[1];
-                var rightNode = this._thesaurifyNodeRecursive(match[3], relId, regs, i) || match[3];
+                var leftNode = this._thesaurifyNodeRecursive(match[1], relId, regs, i) || $('<div></div>').text(match[1]).html();
+                var rightNode = this._thesaurifyNodeRecursive(match[3], relId, regs, i) || $('<div></div>').text(match[3]).html();
                 return  leftNode + html + rightNode;
             }
         }

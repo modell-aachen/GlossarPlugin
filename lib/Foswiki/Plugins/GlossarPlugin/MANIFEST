@@ -13,8 +13,9 @@ pub/System/GlossarPlugin/jquery.thesaurus_de.js 0644 German translation
 pub/System/GlossarPlugin/jquery.thesaurus_en.js 0644 English translation
 pub/System/GlossarPlugin/xregexp.js 0644 extended regexp library
 pub/System/GlossarPlugin/unicode-base.js 0644 unicode letter class for xregexp
-locale/GlossarPlugin/cs.po 0664
-locale/GlossarPlugin/de.po 0664 german translations
-locale/GlossarPlugin/fr.po 0664
-locale/GlossarPlugin/it.po 0664
-locale/GlossarPlugin/zh-cn.po 0664
+locale/GlossarPlugin/cs.po 0644
+locale/GlossarPlugin/de.po 0644 german translations
+locale/GlossarPlugin/fr.po 0644
+locale/GlossarPlugin/hu.po 0644
+locale/GlossarPlugin/it.po 0644
+locale/GlossarPlugin/zh-cn.po 0644
