@@ -18,7 +18,7 @@ var lang = GlossarLang,
     TPL_TAG_CLOSE = '~~',
     UNAPPROPRIATE_TAGS = {'SCRIPT':1, 'BASE':1, 'LINK':1, 'META':1, 'STYLE':1, 'TITLE':1, 'APPLET':1, 'OBJECT':1, 'TEXTAREA':1, 'FORM':1, 'INPUT':1, 'DFN':1},
     DEFAULTCSS_TPL =
-        'div.thesaurus { font-size: 12px; font-family: Arial; position: absolute; width: 300px; z-index: auto; -moz-box-shadow: 5px 5px 5px #444; -webkit-box-shadow: 5px 5px 5px #444; }' +
+        'div.thesaurus { font-size: 12px; font-family: Arial; position: absolute; width: 720px; z-index: auto; -moz-box-shadow: 5px 5px 5px #444; -webkit-box-shadow: 5px 5px 5px #444; }' +
         'div.thesaurus .thesaurus-header { padding: 5px;  background-color: #3C5F87; -moz-border-radius: 5px 5px 0 0; -webkit-border-radius: 5px 5px 0 0; }' +
         'div.thesaurus .thesaurus-header a.term { color: white; font-weight: bold; }' +
         'div.thesaurus .thesaurus-header .term_editbtn { float: right; }' +
