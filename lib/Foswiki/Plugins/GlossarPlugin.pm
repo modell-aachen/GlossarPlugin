@@ -62,7 +62,11 @@ sub initPlugin {
     _generateGwebRegex() unless $gwebRegex;
 
     # controller to be called from the JavaScript
-    Foswiki::Func::registerRESTHandler('controller', \&restController);
+    Foswiki::Func::registerRESTHandler('controller', \&restController,
+        authenticate => 0,
+        validate => 0,
+        http_allow => 'POST,GET',
+    );
 
     # Tag handler for searches
     Foswiki::Func::registerTagHandler('GLOSSARSEARCHOPTS',
