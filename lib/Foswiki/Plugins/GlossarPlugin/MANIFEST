@@ -10,6 +10,7 @@ lib/Foswiki/Plugins/GlossarPlugin/Config.spec 0444 Configuration
 lib/Foswiki/Plugins/GlossarPlugin/JQuery.pm 0444 JQuery plugin
 pub/System/GlossarPlugin/jquery.thesaurus.js 0644 actual thesaurus script
 pub/System/GlossarPlugin/jquery.thesaurus_cs.js 0644 Czech translation
+pub/System/GlossarPlugin/jquery.thesaurus_zh-cn.js 0644 Chinese translation
 pub/System/GlossarPlugin/jquery.thesaurus_cn.js 0644 Chinese translation
 pub/System/GlossarPlugin/jquery.thesaurus_de.js 0644 German translation
 pub/System/GlossarPlugin/jquery.thesaurus_en.js 0644 English translation
