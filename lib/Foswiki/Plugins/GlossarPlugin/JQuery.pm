@@ -12,7 +12,7 @@ our @ISA = qw( Foswiki::Plugins::JQueryPlugin::Plugin );
 sub new {
     my $class = shift;
     my $session = shift || $Foswiki::Plugins::SESSION;
-    my $src = (DEBUG) ? '_src' : '';
+    my $src = $Foswiki::cfg{JQueryPlugin}{Debug} ? '_src' : '';
     my $lang = Foswiki::I18N->new($session)->language();
     my @available_languages = qw(de en);
     $lang = 'en' if !grep $lang, @available_languages;
