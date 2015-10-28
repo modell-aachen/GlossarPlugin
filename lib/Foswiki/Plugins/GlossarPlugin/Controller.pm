@@ -42,7 +42,7 @@ type="query"
 "form.name ~ '*Glossar*Form' AND Enabled = 'Enabled'$addQuery"
 web="$glossar"
 nonoise="on"
-format="$glossar.\$topic\t\$formfield(keywords)"
+format="$glossar.\$topic\t\$formfield(keywords),\$formfield(hiddenkeywords)"
 separator="\$n"
 footer=""
 header=""
@@ -56,7 +56,7 @@ SEARCH
         next if !$entry;
         my ($topic, $kws) = split(/\t/, $entry, 2);
         next unless defined $kws;
-        my @kws = split(/\s*,\s*/, $kws);
+        my @kws = grep /\S/, split(/\s*,\s*/, $kws);
         $re->{$topic} = \@kws;
     }
     return $re;
