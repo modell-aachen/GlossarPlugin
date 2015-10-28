@@ -56,7 +56,7 @@ SEARCH
         next if !$entry;
         my ($topic, $kws) = split(/\t/, $entry, 2);
         next unless defined $kws;
-        my @kws = grep /\S\, split(/\s*,\s*/, $kws);
+        my @kws = grep /\S/, split(/\s*,\s*/, $kws);
         $re->{$topic} = \@kws;
     }
     return $re;
