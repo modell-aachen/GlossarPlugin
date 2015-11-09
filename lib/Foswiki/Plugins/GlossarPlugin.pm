@@ -185,8 +185,11 @@ sub beforeSaveHandler {
     return if $web !~ m/$gwebRegex/;
 
     my $indexChanged = 0;
-    my $iTopic       = 'GlossarIdentifier';
-    return if $iTopic eq $topic;
+    my $ignoreTopics = {
+        'GlossarIdentifier' => 1,
+        'WebStatistic' => 1
+    };
+    return if (exists $ignoreTopics->{$topic});
 
     # Check if topic is new, or keywords have changed
     # XXX doesn't work: if (Foswiki::Func::getContext()->{'new_topic'}) {
