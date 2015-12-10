@@ -113,6 +113,7 @@ sub initPlugin {
     my $css = $Foswiki::cfg{Extensions}{GlossarPlugin}{Css} || '';
     my $pMode = $Foswiki::cfg{Extensions}{GlossarPlugin}{RecursivePopups}
       || 'off';
+    my $onlyfirst = $Foswiki::cfg{Extensions}{GlossarPlugin}{OnlyFirstTermInTitle} || 'off';
     Foswiki::Plugins::JQueryPlugin::registerPlugin(
         'Glossar',
         'Foswiki::Plugins::GlossarPlugin::JQuery');
@@ -127,6 +128,7 @@ jQuery(function(\$) { \$.Thesaurus({
     css: '$css',
     popindelay: $popindelay,
     preload: $preload,
+    onlyFirstTermInTitle: $onlyfirst,
     pMode: '$pMode'
 });
 \$.Thesaurus.init();});//--></script>
