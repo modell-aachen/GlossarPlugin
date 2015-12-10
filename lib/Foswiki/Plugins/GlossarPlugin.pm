@@ -128,7 +128,7 @@ jQuery(function(\$) { \$.Thesaurus({
     css: '$css',
     popindelay: $popindelay,
     preload: $preload,
-    onlyFirstTermInTitle: $onlyfirst,
+    onlyFirstTermInTitle: '$onlyfirst',
     pMode: '$pMode'
 });
 \$.Thesaurus.init();});//--></script>
