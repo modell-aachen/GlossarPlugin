@@ -187,7 +187,7 @@ sub beforeSaveHandler {
     my $indexChanged = 0;
     my $ignoreTopics = {
         'GlossarIdentifier' => 1,
-        'WebStatistic' => 1
+        'WebStatistics' => 1
     };
     return if (exists $ignoreTopics->{$topic});
 
