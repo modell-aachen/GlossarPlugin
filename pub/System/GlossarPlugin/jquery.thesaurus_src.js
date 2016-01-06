@@ -389,7 +389,7 @@ Thesaurus.prototype = {
             Tooltip.setContent(e, {text: data.text});
             instance.setLink(linkbase + webtopic);
             if (data.edit) {
-                instance.setEditLink(foswiki.getPreference('SCRIPTURLPATH')+'/edit'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+webtopic);
+                instance.setEditLink(foswiki.getPreference('SCRIPTURLPATH')+'/edit'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+webtopic+'?t='+(new Date().getTime()/1000));
             } else {
                 instance.setEditLink(null);
             }
