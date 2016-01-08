@@ -86,7 +86,7 @@ sub _getTopic {
     # generate text for popup from found topic
     my ($meta, $text) = Foswiki::Func::readTopic($glossar, $topic);
 
-    my $canCHange = $meta->expandMacros("%WORKFLOWEDITPERM{web=\"$glossar\" topic=\"$topic\"}%");
+    my $canChange = $meta->expandMacros("%WORKFLOWEDITPERM{web=\"$glossar\" topic=\"$topic\"}%");
 
     # try to emulate automatic selection of viewtemplate for form
     my $tmpl;

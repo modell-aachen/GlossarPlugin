@@ -29,6 +29,7 @@ var lang = GlossarLang,
         '.hidden {display: none}',
     TOOLTIP_LOADING_TPL = '<img src="%PUBURLPATH%/%SYSTEMWEB%/JQueryPlugin/images/spinner.gif">', // can't use foswiki object yet, we might be loaded before FOSWIKI::PREFERENCES
     TOOLTIP_DISAMBIG_TPL = '<div class="thesaurus-addendum"><div class="thesaurus-alts-title">'+lang.disambiguate+'</div><ul class="thesaurus-alts"></ul></div>',
+    // This template is overridden by an entry from LocalSite.cfg. If you change this, please change the default in Config.spec, too.
     TOOLTIP_BODY_TPL = '<div class="thesaurus-header"><a class="term_editbtn foswikiButton">'+lang.btn_edit_label+'</a><a class="term"></a></div><div class="thesaurus-body"><div class="thesaurus-text"></div></div>';
 
 var Collection = function() { };
@@ -707,6 +708,11 @@ $.Thesaurus = function(options) {
 // Call this function to initialize the thesaurus.
 // You will need to set the required options (controller etc.) prior to initialisation.
 $.Thesaurus.init = function() {
+    var $popup_body_tpl = $('#GlossarPlugin_popup_body_template');
+    if ($popup_body_tpl.length && $popup_body_tpl.html() !== '') {
+      TOOLTIP_BODY_TPL = $popup_body_tpl.html();
+      $popup_body_tpl.remove();
+    }
     new Thesaurus(Thesaurus.options);
 };
 

@@ -38,3 +38,7 @@ $Foswiki::cfg{Extensions}{GlossarPlugin}{AdditionalQuery} = '';
 # **STRING**
 # Do not activate glossar in topics that match this regex.
 $Foswiki::cfg{Extensions}{GlossarPlugin}{SkipTopic} = '^(WikiGroups|WikiUsers|WebChanges|WebCreateNewTopic|SolrSearch|WebSearch|WebTopicList|WebPreferences|SitePreferences|WebAtom|WebNotify|WebIndex|WebStatistics)$';
+# **STRING**
+# Template for pop-up body (the actual content will be dynamically inserted by JS, so do use the same class names as in the original).
+# Please note that macros will be expanded only once per page view, so you can't use macros that make decisions based on an individual glossary topic.
+$Foswiki::cfg{Extensions}{GlossarPlugin}{PopupBodyTemplate} = '<div class="thesaurus-header"><a class="term_editbtn foswikiButton">%MAKETEXT{"Edit"}%</a><a class="term"></a></div><div class="thesaurus-body"><div class="thesaurus-text"></div></div>';
