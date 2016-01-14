@@ -407,7 +407,11 @@ Thesaurus.prototype = {
         return $.map(terms, function(t) { return o._displayTerm(t); }).join(', ');
     },
     _fetchTooltip : function(e, instance, term, topic) {
-        Tooltip.setContent(e, {title: this._makeSynset(this.topics[topic]), titlehint: topic, text: TOOLTIP_LOADING_TPL});
+        if (this.options.onlyFirstTermInTitle == 'on') {
+            Tooltip.setContent(e, {title: this._displayTerm(this.topics[topic][0]), titlehint: topic, text: TOOLTIP_LOADING_TPL});
+        } else {
+            Tooltip.setContent(e, {title: this._makeSynset(this.topics[topic]), titlehint: topic, text: TOOLTIP_LOADING_TPL});
+        }
         instance.setEditLink(null);
         var fromcache = this.cache[topic];
         if (undefined !== fromcache)
@@ -692,6 +696,7 @@ Thesaurus.options = {
     popindelay: 1000,
     preload: 400,
     pMode: 'on',
+    onlyFirstTermInTitle: 'off',
     id: 0
 };
 // Alternative way to specify nodes you wat analyze for terms occurances
