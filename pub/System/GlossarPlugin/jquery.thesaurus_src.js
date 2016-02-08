@@ -29,6 +29,7 @@ var lang = GlossarLang,
         '.hidden {display: none}',
     TOOLTIP_LOADING_TPL = '<img src="%PUBURLPATH%/%SYSTEMWEB%/JQueryPlugin/images/spinner.gif">', // can't use foswiki object yet, we might be loaded before FOSWIKI::PREFERENCES
     TOOLTIP_DISAMBIG_TPL = '<div class="thesaurus-addendum"><div class="thesaurus-alts-title">'+lang.disambiguate+'</div><ul class="thesaurus-alts"></ul></div>',
+    // This template is overridden by an entry from LocalSite.cfg. If you change this, please change the default in Config.spec, too.
     TOOLTIP_BODY_TPL = '<div class="thesaurus-header"><a class="term_editbtn foswikiButton">'+lang.btn_edit_label+'</a><a class="term"></a></div><div class="thesaurus-body"><div class="thesaurus-text"></div></div>';
 
 var Collection = function() { };
@@ -389,7 +390,7 @@ Thesaurus.prototype = {
             Tooltip.setContent(e, {text: data.text});
             instance.setLink(linkbase + webtopic);
             if (data.edit) {
-                instance.setEditLink(foswiki.getPreference('SCRIPTURLPATH')+'/edit'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+webtopic);
+                instance.setEditLink(foswiki.getPreference('SCRIPTURLPATH')+'/edit'+foswiki.getPreference('SCRIPTSUFFIX')+'/'+webtopic+'?t='+(new Date().getTime()/1000));
             } else {
                 instance.setEditLink(null);
             }
@@ -406,7 +407,11 @@ Thesaurus.prototype = {
         return $.map(terms, function(t) { return o._displayTerm(t); }).join(', ');
     },
     _fetchTooltip : function(e, instance, term, topic) {
-        Tooltip.setContent(e, {title: this._makeSynset(this.topics[topic]), titlehint: topic, text: TOOLTIP_LOADING_TPL});
+        if (this.options.onlyFirstTermInTitle == 'on') {
+            Tooltip.setContent(e, {title: this._displayTerm(this.topics[topic][0]), titlehint: topic, text: TOOLTIP_LOADING_TPL});
+        } else {
+            Tooltip.setContent(e, {title: this._makeSynset(this.topics[topic]), titlehint: topic, text: TOOLTIP_LOADING_TPL});
+        }
         instance.setEditLink(null);
         var fromcache = this.cache[topic];
         if (undefined !== fromcache)
@@ -691,6 +696,7 @@ Thesaurus.options = {
     popindelay: 1000,
     preload: 400,
     pMode: 'on',
+    onlyFirstTermInTitle: 'off',
     id: 0
 };
 // Alternative way to specify nodes you wat analyze for terms occurances
@@ -707,6 +713,11 @@ $.Thesaurus = function(options) {
 // Call this function to initialize the thesaurus.
 // You will need to set the required options (controller etc.) prior to initialisation.
 $.Thesaurus.init = function() {
+    var $popup_body_tpl = $('#GlossarPlugin_popup_body_template');
+    if ($popup_body_tpl.length && $popup_body_tpl.html() !== '') {
+      TOOLTIP_BODY_TPL = $popup_body_tpl.html();
+      $popup_body_tpl.remove();
+    }
     new Thesaurus(Thesaurus.options);
 };
 

@@ -27,12 +27,12 @@ If no term is given in the request it will return a list of known definitions, o
 =cut
 
 sub _getList {
-    my ($user, $glossar, $addQuery) = @_;
+    my ($glossar, $addQuery) = @_;
     $glossar =~ s#/#.#g;
 
     return (undef, '403', ($Foswiki::cfg{Extensions}{GlossarPlugin}{AccessAreaPermission}
       || 'Error: Unfortunately you do not have sufficient permissions to view glossary entries!'))
-      unless Foswiki::Func::checkAccessPermission('VIEW', $user, '', undef,
+      unless Foswiki::Func::checkAccessPermission('VIEW', Foswiki::Func::getWikiName(), '', undef,
         $glossar, undef);
 
     my $kwdata =
@@ -63,14 +63,14 @@ SEARCH
 }
 
 sub _getTopic {
-    my ($user, $webtopic) = @_;
+    my ($webtopic) = @_;
 
     my ($glossar, $topic) = Foswiki::Func::normalizeWebTopicName(undef, $webtopic);
 
     my $re;
     unless (
         Foswiki::Func::checkAccessPermission(
-            'VIEW', $user, '', $topic, $glossar, undef
+            'VIEW', Foswiki::Func::getWikiName(), '', $topic, $glossar, undef
         ))
     {
         $re = $Foswiki::cfg{Extensions}{GlossarPlugin}{AccessMsg}
@@ -83,10 +83,11 @@ sub _getTopic {
         return (undef, '404', $re);
     }
 
-    my $canChange = Foswiki::Func::checkAccessPermission('CHANGE', $user, '', $topic, $glossar, undef);
-
     # generate text for popup from found topic
     my ($meta, $text) = Foswiki::Func::readTopic($glossar, $topic);
+
+    my $canChange = $meta->expandMacros("%WORKFLOWEDITPERM{web=\"$glossar\" topic=\"$topic\"}%");
+
     # try to emulate automatic selection of viewtemplate for form
     my $tmpl;
     my $view = $meta->getFormName();
@@ -127,8 +128,6 @@ sub response {
     my ($session, $subject, $verb, $response) = @_;
     my $query = $session->{request};
     my $topic = $query->{param}->{thetopic}[0];  # topic to display in a popup
-    my $user = $Foswiki::Plugins::SESSION->{user};  # user for AccessPermission
-    $user = Foswiki::Func::getWikiName($user);
     my $glossar = $query->param('web')
       || $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb}
       || 'Glossar';  # The web with the definitions
@@ -142,9 +141,9 @@ sub response {
 
     # check if topic is given, otherwise a list of terms is requested
     if (not defined $topic) {
-        @re = _getList($user, $glossar, $addQuery);
+        @re = _getList($glossar, $addQuery);
     } else {
-        @re = _getTopic($user, $topic);
+        @re = _getTopic($topic);
     }
     my $status = defined($re[0]) ? 'ok' : $re[1];
     my $payload = defined($re[0]) ? $re[0] : [];

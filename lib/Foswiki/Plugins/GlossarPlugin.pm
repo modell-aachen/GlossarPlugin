@@ -113,10 +113,13 @@ sub initPlugin {
     my $css = $Foswiki::cfg{Extensions}{GlossarPlugin}{Css} || '';
     my $pMode = $Foswiki::cfg{Extensions}{GlossarPlugin}{RecursivePopups}
       || 'off';
+    my $popupBodyTpl = $Foswiki::cfg{Extensions}{GlossarPlugin}{PopupBodyTemplate} || '';
+    my $onlyfirst = $Foswiki::cfg{Extensions}{GlossarPlugin}{OnlyFirstTermInTitle} || 'off';
     Foswiki::Plugins::JQueryPlugin::registerPlugin(
         'Glossar',
         'Foswiki::Plugins::GlossarPlugin::JQuery');
     my $script = <<SCRIPT;
+<div id="GlossarPlugin_popup_body_template" style="display: none;">$popupBodyTpl</div>
 <script type="text/javascript"><!--
 jQuery(function(\$) { \$.Thesaurus({
     caseSensitive: '$caseSensitive',
@@ -127,6 +130,7 @@ jQuery(function(\$) { \$.Thesaurus({
     css: '$css',
     popindelay: $popindelay,
     preload: $preload,
+    onlyFirstTermInTitle: '$onlyfirst',
     pMode: '$pMode'
 });
 \$.Thesaurus.init();});//--></script>
