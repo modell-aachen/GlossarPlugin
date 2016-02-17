@@ -115,6 +115,7 @@ sub initPlugin {
       || 'off';
     my $popupBodyTpl = $Foswiki::cfg{Extensions}{GlossarPlugin}{PopupBodyTemplate} || '';
     my $onlyfirst = $Foswiki::cfg{Extensions}{GlossarPlugin}{OnlyFirstTermInTitle} || 'off';
+    my $excludeSelector = $Foswiki::cfg{Extensions}{GlossarPlugin}{ExcludeSelector} || 'DUMMY';
     Foswiki::Plugins::JQueryPlugin::registerPlugin(
         'Glossar',
         'Foswiki::Plugins::GlossarPlugin::JQuery');
@@ -131,6 +132,7 @@ jQuery(function(\$) { \$.Thesaurus({
     popindelay: $popindelay,
     preload: $preload,
     onlyFirstTermInTitle: '$onlyfirst',
+    excludeSelector: '$excludeSelector',
     pMode: '$pMode'
 });
 \$.Thesaurus.init();});//--></script>

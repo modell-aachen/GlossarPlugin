@@ -647,9 +647,10 @@ Thesaurus.prototype = {
         return false;
     },
     _thesaurifyCollectNodes : function(node, result) {
+        var self = this;
         $.each($(node).get(), $.proxy(function(inx, el){
             $.each(el.childNodes, $.proxy(function(i, child){
-                if (child.nodeType == 1 && child.childNodes.length && undefined === UNAPPROPRIATE_TAGS[child.tagName]) {
+                if (child.nodeType == 1 && child.childNodes.length && undefined === UNAPPROPRIATE_TAGS[child.tagName] && !$(child).is(self.options.excludeSelector) ) {
                     this._thesaurifyCollectNodes(child, result);
                 }
                 // Is it a non-empty text node?
@@ -697,6 +698,7 @@ Thesaurus.options = {
     preload: 400,
     pMode: 'on',
     onlyFirstTermInTitle: 'off',
+    excludeSelector: 'DUMMY',
     id: 0
 };
 // Alternative way to specify nodes you wat analyze for terms occurances
