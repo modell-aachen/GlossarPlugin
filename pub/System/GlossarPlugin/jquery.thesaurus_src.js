@@ -440,7 +440,9 @@ Thesaurus.prototype = {
             if (forceTopic) {
                 if(!/[./]/.exec(forceTopic)) forceTopic = foswiki.getPreference('WEB') + '.' + forceTopic;
                 forceTopic = forceTopic.replace(/\//g, '.');
-                topics = [forceTopic];
+                if ($.inArray(forceTopic, topics) != -1) {
+                    topics = [forceTopic];
+                }
             }
             if(!(topics && topics.length)) {
                 window.console && console.log("Could not find topics for " + term);
