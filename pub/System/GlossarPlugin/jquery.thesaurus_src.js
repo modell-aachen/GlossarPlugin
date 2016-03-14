@@ -18,11 +18,11 @@ var lang = GlossarLang,
     TPL_TAG_CLOSE = '~~',
     UNAPPROPRIATE_TAGS = {'SCRIPT':1, 'BASE':1, 'LINK':1, 'META':1, 'STYLE':1, 'TITLE':1, 'APPLET':1, 'OBJECT':1, 'TEXTAREA':1, 'FORM':1, 'INPUT':1, 'DFN':1, 'svg':1, 'SVG':1},
     DEFAULTCSS_TPL =
-        'div.thesaurus { font-size: 12px; font-family: Arial; position: absolute; width: 720px; z-index: auto; -moz-box-shadow: 5px 5px 5px #444; -webkit-box-shadow: 5px 5px 5px #444; }' +
-        'div.thesaurus .thesaurus-header { padding: 5px;  background-color: #3C5F87; -moz-border-radius: 5px 5px 0 0; -webkit-border-radius: 5px 5px 0 0; }' +
+        'div.thesaurus { font-size: 12px; font-family: Arial; position: absolute; width: 720px; z-index: auto;}' +
+        'div.thesaurus .thesaurus-header { padding: 5px;  background-color: #3C5F87;}' +
         'div.thesaurus .thesaurus-header a.term { color: white; font-weight: bold; }' +
         'div.thesaurus .thesaurus-header .term_editbtn { float: right; }' +
-        'div.thesaurus .thesaurus-body { padding: 5px;  border: 1px solid #3C5F87; background-color: #fff; -moz-border-radius: 0 0 0 5px; -webkit-border-radius: 0 0 0 5px; }' +
+        'div.thesaurus .thesaurus-body { padding: 5px;  border: 1px solid #3C5F87; background-color: #fff;}' +
         'div.thesaurus .thesaurus-addendum { background-color: #ddd; padding-bottom: 0.5em; }' +
         'div.thesaurus .thesaurus-alts ul { margin: 0; }' +
         'dfn.thesaurus { text-decoration: none; font-style: inherit; border-bottom: 1px dashed black; cursor: pointer; }' +
@@ -440,7 +440,9 @@ Thesaurus.prototype = {
             if (forceTopic) {
                 if(!/[./]/.exec(forceTopic)) forceTopic = foswiki.getPreference('WEB') + '.' + forceTopic;
                 forceTopic = forceTopic.replace(/\//g, '.');
-                topics = [forceTopic];
+                if ($.inArray(forceTopic, topics) != -1) {
+                    topics = [forceTopic];
+                }
             }
             if(!(topics && topics.length)) {
                 window.console && console.log("Could not find topics for " + term);
@@ -647,9 +649,10 @@ Thesaurus.prototype = {
         return false;
     },
     _thesaurifyCollectNodes : function(node, result) {
+        var self = this;
         $.each($(node).get(), $.proxy(function(inx, el){
             $.each(el.childNodes, $.proxy(function(i, child){
-                if (child.nodeType == 1 && child.childNodes.length && undefined === UNAPPROPRIATE_TAGS[child.tagName]) {
+                if (child.nodeType == 1 && child.childNodes.length && undefined === UNAPPROPRIATE_TAGS[child.tagName] && !$(child).is(self.options.excludeSelector) ) {
                     this._thesaurifyCollectNodes(child, result);
                 }
                 // Is it a non-empty text node?
@@ -697,6 +700,7 @@ Thesaurus.options = {
     preload: 400,
     pMode: 'on',
     onlyFirstTermInTitle: 'off',
+    excludeSelector: 'DUMMY',
     id: 0
 };
 // Alternative way to specify nodes you wat analyze for terms occurances

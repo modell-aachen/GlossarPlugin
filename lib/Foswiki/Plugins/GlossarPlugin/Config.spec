@@ -7,6 +7,9 @@ $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb} = 'Glossar';
 # **STRING**
 # Selector for the portions of the displayed page in that terms should be highlighted. Be careful not to select your editor.<p>Default setting is for PatternSkin.</p>
 $Foswiki::cfg{Extensions}{GlossarPlugin}{Containers} = 'div.patternContent div.foswikiTopic';
+# **STRING**
+# Selector for individual elements within containers (see above) in which terms should not be highlighted.<p>By default, no elements are excluded.</p>
+$Foswiki::cfg{Extensions}{GlossarPlugin}{ExcludeSelector} = '';
 # **SELECT null,'fade','slide'**
 # Popin effect. Select null for none.
 $Foswiki::cfg{Extensions}{GlossarPlugin}{Effect} = 'null';
