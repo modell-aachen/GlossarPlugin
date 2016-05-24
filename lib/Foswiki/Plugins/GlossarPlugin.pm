@@ -245,6 +245,8 @@ sub _generateNewId {
     return unless Foswiki::Func::webExists($web); # eg. newly created web / converting
 
     my ($iMeta, $iText) = Foswiki::Func::readTopic($web, $iTopic);
+    $iText = '' unless defined $iText; # topic did not yet exist
+
     $iMeta->put('GLOSSARY', {index => $newIdentifier});
     Foswiki::Func::saveTopic($web, $iTopic, $iMeta, $iText,
         {ignorepermissions => 1});
