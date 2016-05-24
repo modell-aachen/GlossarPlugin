@@ -242,6 +242,8 @@ sub _generateNewId {
     my $iTopic        = 'GlossarIdentifier';
     my $newIdentifier = int(rand(1000000));
 
+    return unless Foswiki::Func::webExists($web); # eg. newly created web / converting
+
     my ($iMeta, $iText) = Foswiki::Func::readTopic($web, $iTopic);
     $iMeta->put('GLOSSARY', {index => $newIdentifier});
     Foswiki::Func::saveTopic($web, $iTopic, $iMeta, $iText,
