@@ -1,0 +1,1 @@
+/opt/repos/GlossarPlugin/pub/System/GlossarPlugin/jquery.thesaurus_zh-cn_src.js
