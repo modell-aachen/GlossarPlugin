@@ -1,6 +1,7 @@
+// GlossarPlugin: French language file
 GlossarLang = {
-    ambiguous: '(multiple meanings)',
-    disambiguate: 'There are several definitions for this term:',
-    btn_edit_label: 'Edit'
+    ambiguous: '(plusieurs significations)',
+    disambiguate: 'Il y existe plusieurs définitions pour ce terme:',
+    btn_edit_label: 'Modifier'
 };
 
