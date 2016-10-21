@@ -9,17 +9,51 @@ lib/Foswiki/Plugins/GlossarPlugin/Controller.pm 0444 Controller for the JavaScri
 lib/Foswiki/Plugins/GlossarPlugin/Config.spec 0444 Configuration
 lib/Foswiki/Plugins/GlossarPlugin/JQuery.pm 0444 JQuery plugin
 pub/System/GlossarPlugin/jquery.thesaurus.js 0644 actual thesaurus script
-pub/System/GlossarPlugin/jquery.thesaurus_src.js 0644 actual thesaurus script
 pub/System/GlossarPlugin/jquery.thesaurus_cs.js 0644 Czech translation
 pub/System/GlossarPlugin/jquery.thesaurus_cs_src.js 0644 Czech translation
+pub/System/GlossarPlugin/jquery.thesaurus_da.js 0644 Danish translation
+pub/System/GlossarPlugin/jquery.thesaurus_da_src.js 0644 Danish translation
 pub/System/GlossarPlugin/jquery.thesaurus_de.js 0644 German translation
 pub/System/GlossarPlugin/jquery.thesaurus_de_src.js 0644 German translation
+pub/System/GlossarPlugin/jquery.thesaurus_el.js 0644 Modern Greek translation
+pub/System/GlossarPlugin/jquery.thesaurus_el_src.js 0644 Modern Greek translation
 pub/System/GlossarPlugin/jquery.thesaurus_en.js 0644 English translation
 pub/System/GlossarPlugin/jquery.thesaurus_en_src.js 0644 English translation
+pub/System/GlossarPlugin/jquery.thesaurus_es.js 0644 Spanish translation
+pub/System/GlossarPlugin/jquery.thesaurus_es_src.js 0644 Spanish translation
+pub/System/GlossarPlugin/jquery.thesaurus_fi.js 0644 Finnish translation
+pub/System/GlossarPlugin/jquery.thesaurus_fi_src.js 0644 Finnish translation
 pub/System/GlossarPlugin/jquery.thesaurus_fr.js 0644 French translation
 pub/System/GlossarPlugin/jquery.thesaurus_fr_src.js 0644 French translation
+pub/System/GlossarPlugin/jquery.thesaurus_it.js 0644 Italy translation
+pub/System/GlossarPlugin/jquery.thesaurus_it_src.js 0644 Italy translation
+pub/System/GlossarPlugin/jquery.thesaurus_ja.js 0644 Japan translation
+pub/System/GlossarPlugin/jquery.thesaurus_ja_src.js 0644 Japan translation
+pub/System/GlossarPlugin/jquery.thesaurus_ko.js 0644 Korean translation
+pub/System/GlossarPlugin/jquery.thesaurus_ko_src.js 0644 Korean translation
+pub/System/GlossarPlugin/jquery.thesaurus_nl.js 0644 Dutch translation
+pub/System/GlossarPlugin/jquery.thesaurus_nl_src.js 0644 Dutch translation
+pub/System/GlossarPlugin/jquery.thesaurus_no.js 0644 Norwegian translation
+pub/System/GlossarPlugin/jquery.thesaurus_no_src.js 0644 Norwegian translation
+pub/System/GlossarPlugin/jquery.thesaurus_pl.js 0644 Polish translation
+pub/System/GlossarPlugin/jquery.thesaurus_pl_src.js 0644 Polish translation
+pub/System/GlossarPlugin/jquery.thesaurus_pt-br.js 0644 Brazilian Portuguese translation
+pub/System/GlossarPlugin/jquery.thesaurus_pt-br_src.js 0644 Brazilian Portuguese translation
+pub/System/GlossarPlugin/jquery.thesaurus_ru.js 0644 Russian translation
+pub/System/GlossarPlugin/jquery.thesaurus_ru_src.js 0644 Russian translation
+pub/System/GlossarPlugin/jquery.thesaurus_src.js 0644 actual thesaurus script
+pub/System/GlossarPlugin/jquery.thesaurus_sv.js 0644 Swedish translation
+pub/System/GlossarPlugin/jquery.thesaurus_sv_src.js 0644 Swedish translation
+pub/System/GlossarPlugin/jquery.thesaurus_tlh.js 0644 Klingon translation
+pub/System/GlossarPlugin/jquery.thesaurus_tlh_src.js 0644 Klingon translation
+pub/System/GlossarPlugin/jquery.thesaurus_tr.js 0644 Turkish translation
+pub/System/GlossarPlugin/jquery.thesaurus_tr_src.js 0644 Turkish translation
+pub/System/GlossarPlugin/jquery.thesaurus_uk.js 0644 Ukrainian translation
+pub/System/GlossarPlugin/jquery.thesaurus_uk_src.js 0644 Ukrainian translation
 pub/System/GlossarPlugin/jquery.thesaurus_zh-cn.js 0644 Chinese translation
 pub/System/GlossarPlugin/jquery.thesaurus_zh-cn_src.js 0644 Chinese translation
+pub/System/GlossarPlugin/jquery.thesaurus_zh-tw.js 0644 Chinese (Taiwan) translation
+pub/System/GlossarPlugin/jquery.thesaurus_zh-tw_src.js 0644 Chinese (Taiwan) translation
 pub/System/GlossarPlugin/xregexp.js 0644 extended regexp library
 pub/System/GlossarPlugin/xregexp_src.js 0644 extended regexp library
 pub/System/GlossarPlugin/unicode-base.js 0644 unicode letter class for xregexp
