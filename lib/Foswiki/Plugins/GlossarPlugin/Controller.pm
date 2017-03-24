@@ -93,10 +93,8 @@ sub _getTopic {
     my $view = $meta->getFormName();
     if ( $view ) {
         $view =~ s#Form$#View#;
-        if ( Foswiki::Func::topicExists($glossar, "${view}Template") ) {
-            Foswiki::Func::loadTemplate($view, undef, $glossar);
-            $tmpl = Foswiki::Func::expandTemplate('PopupContent');
-        }
+        Foswiki::Func::loadTemplate($view);
+        $tmpl = Foswiki::Func::expandTemplate('PopupContent');
     }
     unless ( $tmpl ) {
         # fallback to standard template
