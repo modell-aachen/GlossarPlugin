@@ -120,7 +120,7 @@ sub initPlugin {
         'Glossar',
         'Foswiki::Plugins::GlossarPlugin::JQuery');
     my $script = <<SCRIPT;
-<div id="GlossarPlugin_popup_body_template" style="display: none;">$popupBodyTpl</div>
+<script id="GlossarPlugin_popup_body_template" type="text/x-html">$popupBodyTpl</script>
 <script type="text/javascript"><!--
 jQuery(function(\$) { \$.Thesaurus({
     caseSensitive: '$caseSensitive',
