@@ -9,7 +9,7 @@ $Foswiki::cfg{Extensions}{GlossarPlugin}{GlossarWeb} = 'Glossar';
 $Foswiki::cfg{Extensions}{GlossarPlugin}{Containers} = 'div.patternContent div.foswikiTopic';
 # **STRING**
 # Selector for individual elements within containers (see above) in which terms should not be highlighted.<p>By default, no elements are excluded.</p>
-$Foswiki::cfg{Extensions}{GlossarPlugin}{ExcludeSelector} = 'GlossaryConditionalTag,.SearchGridContainer';
+$Foswiki::cfg{Extensions}{GlossarPlugin}{ExcludeSelector} = '.GlossaryConditionalTag,.SearchGridContainer';
 # **SELECT null,'fade','slide'**
 # Popin effect. Select null for none.
 $Foswiki::cfg{Extensions}{GlossarPlugin}{Effect} = 'null';
