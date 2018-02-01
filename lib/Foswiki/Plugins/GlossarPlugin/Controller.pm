@@ -93,7 +93,7 @@ sub _getTopic {
     my $view = $meta->getFormName();
     if ( $view ) {
         $view =~ s#Form$#View#;
-        Foswiki::Func::loadTemplate($view);
+        Foswiki::Func::loadTemplate($view, undef, $glossar);
         $tmpl = Foswiki::Func::expandTemplate('PopupContent');
     }
     unless ( $tmpl ) {
