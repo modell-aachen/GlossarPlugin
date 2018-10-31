@@ -38,6 +38,10 @@ our $NO_PREFS_IN_TOPIC = 1;
 # Regex to check if a web is a glossary web (as set in configure)
 our $gwebRegex;
 
+our $SITEPREFS = {
+    GLOSSAR_CASE => "on"
+};
+
 =begin TML
 
 ---++ initPlugin($topic, $web, $user) -> $boolean
@@ -104,7 +108,7 @@ sub initPlugin {
     my $restPath = Foswiki::Func::getScriptUrl('', '', 'rest');
     my $containers = $Foswiki::cfg{Extensions}{GlossarPlugin}{Containers}
       || '';
-    my $caseSensitive = $Foswiki::cfg{Extensions}{GlossarPlugin}{Case}
+    my $caseSensitive = Foswiki::Func::getPreferencesValue('GLOSSAR_CASE');
       || 'off';
     my $effect = $Foswiki::cfg{Extensions}{GlossarPlugin}{Effect} || 'null';
     my $popindelay = $Foswiki::cfg{Extensions}{GlossarPlugin}{PopInDelay}
