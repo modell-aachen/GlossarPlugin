@@ -108,7 +108,7 @@ sub initPlugin {
     my $restPath = Foswiki::Func::getScriptUrl('', '', 'rest');
     my $containers = $Foswiki::cfg{Extensions}{GlossarPlugin}{Containers}
       || '';
-    my $caseSensitive = Foswiki::Func::getPreferencesValue('GLOSSAR_CASE');
+    my $caseSensitive = Foswiki::Func::getPreferencesValue('GLOSSAR_CASE')
       || 'off';
     my $effect = $Foswiki::cfg{Extensions}{GlossarPlugin}{Effect} || 'null';
     my $popindelay = $Foswiki::cfg{Extensions}{GlossarPlugin}{PopInDelay}
