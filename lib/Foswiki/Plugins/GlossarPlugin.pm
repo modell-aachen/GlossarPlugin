@@ -39,7 +39,7 @@ our $NO_PREFS_IN_TOPIC = 1;
 our $gwebRegex;
 
 our $SITEPREFS = {
-    GLOSSAR_CASE => "on"
+    GLOSSARY_CASE => "on"
 };
 
 =begin TML
@@ -108,7 +108,7 @@ sub initPlugin {
     my $restPath = Foswiki::Func::getScriptUrl('', '', 'rest');
     my $containers = $Foswiki::cfg{Extensions}{GlossarPlugin}{Containers}
       || '';
-    my $caseSensitive = Foswiki::Func::getPreferencesValue('GLOSSAR_CASE')
+    my $caseSensitive = Foswiki::Func::getPreferencesValue('GLOSSARY_CASE')
       || 'off';
     my $effect = $Foswiki::cfg{Extensions}{GlossarPlugin}{Effect} || 'null';
     my $popindelay = $Foswiki::cfg{Extensions}{GlossarPlugin}{PopInDelay}
