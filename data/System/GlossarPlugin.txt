@@ -20,6 +20,9 @@ prefer.
 %NOP%   * Set GLOSSAR = 1
 </pre>
    * (eventually redirect your WebHome to GlossarIndex: =%%NOP%REDIRECT{"GlossarIndex"}%=)
+   * Set terms case-sensitive in _WebPreferences/SitePreferences_ <pre>
+%NOP%   * Set GLOSSARY_CASE = on
+</pre>
 
 ---++ Usage
 ---+++ Defining a custom =VIEW_TEMPLATE= for entries
