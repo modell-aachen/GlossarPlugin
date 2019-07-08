@@ -152,7 +152,6 @@ Tooltip.prototype = {
         this.boxes.body = this.boundingBox.find('div.thesaurus-body');
         this.boxes.text = this.boundingBox.find('div.thesaurus-text');
         this.boxes.edit = this.boundingBox.find('a.term_editbtn').hide();
-        this.boxes.title.html($(this.currentTarget).text());
         TOOLTIP_LOADING_TPL = TOOLTIP_LOADING_TPL.replace('%PUBURLPATH%', foswiki.getPreference('PUBURLPATH')).replace('%SYSTEMWEB%', foswiki.getPreference('SYSTEMWEB'));
         this.boxes.text.html(TOOLTIP_LOADING_TPL);
         this.adjust();
@@ -521,7 +520,8 @@ Thesaurus.prototype = {
         return data.payload;
     },
     _displayTerm : function(term) {
-        return this.options.caseSensitive != 'off' ? term : this.canonicalTerms[term.toLowerCase()];
+        term = this.options.caseSensitive != 'off' ? term : this.canonicalTerms[term.toLowerCase()];
+        return htmlEntities(term);
     },
     _internalTerm : function(term) {
         return this.options.caseSensitive != 'off' ? term : term.toLowerCase();
@@ -636,6 +636,7 @@ Thesaurus.prototype = {
             }
             var match = regs[i][2].exec(html);
             if(match) {
+                match[2] = htmlEntities(match[2]);
                 if(relId) {
                     html = '<dfn rel="'+ relId +'" class="thesaurus">' + match[2] + '</dfn>';
                 } else {
@@ -686,6 +687,9 @@ Thesaurus.prototype = {
     }
 };
 
+function htmlEntities(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 /**
  * Default configuration
  */
